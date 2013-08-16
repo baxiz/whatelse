@@ -213,26 +213,6 @@ function drawPumpkins() {
 				}
 		}
 		
-function drawTarget() {
-			
-			ctx.strokeStyle = "red";
-            // for each target:
-            for (i = 0; i < targets; i++) {
-                // if target not yet hit:
-                if (target[i]) {
-                 
-				 var tY =  25 * Math.sin(targetY[i]);
-                    ctx.arc(targetX[i], tY, 10, 0, 2 * Math.PI);
-                    
-					// if bullet inside circle, target is hit
-                    /*if (bulletX && ctx.isPointInPath(bulletX,bulletY)) {
-                        target[i] = 0;
-                        score = score + 10;
-                    }*/
-                }
-            }
-        }
- 
 function drawBullet() {					//pumpkin here
             if (bulletX)
                 ctx.fillRect(bulletX, bulletY, 2, 1);
