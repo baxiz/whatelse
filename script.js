@@ -16,14 +16,9 @@ var broom=function() {					//has coords of broom
 		this.shipY=140;
 }
 
-var bat=function(){
-		this.shipX=0;
-		this.xIncr=5;
-}
-
 var background= function() {			//var for scrolling background
 		this.xBack=0;
-		this.xIncr=2;
+		this.xIncr=4;
 }
 
 var pumpkin= function(){
@@ -43,7 +38,7 @@ var collected= function(){
 
 var broomht = new broom();
 var changebg = new background();
-var changebat = new bat();
+var changebat=new background();
 var sc=new collected();
 	
 var fruit1 = new points();
@@ -106,19 +101,20 @@ function animate() {
             drawScore();
 					
 			// if background scrolled off screen, reset
-            if (changebg.xBack <= -1 * 1200)
+            if(changebat.xBack<-1200)
+				{
+					changebat.xBack += 1200;
+					height.ht=Math.random()*200;
+					height1.ht=Math.random()*250;
+					height2.ht=Math.random()*300;
+				}
+			
+			if (changebg.xBack <= -1 * 1200)
             	{
 					changebg.xBack += 1200;
 					
-					if(changebat.xBack<-1200)
-					changebat.xBack += 1200;
-					
-					height.ht=Math.random()*200+50;
-					height1.ht=Math.random()*200+50;
-					height2.ht=Math.random()*250+50;
-					
-					fruit1.arr=Math.random()*350+50;
-					fruit2.arr=Math.random()*350+50;
+					fruit1.arr=Math.random()*300+50;
+					fruit2.arr=Math.random()*300+50;
 					target1=[1,1,1,1];
 					target2=[1,1,1,1];
 				}
@@ -161,8 +157,6 @@ function model() {
 function drawBack() {
                 // pan background                
                 changebg.xBack -= changebg.xIncr;
-				changebat.xBack -= changebat.xIncr;
-				
                 ctx.drawImage(back, changebg.xBack, 0 ,1200, 500);			//800--> image width
                 // draw new copy at right edge of old copy
                 ctx.drawImage(back, changebg.xBack +1200 , 0 ,1200 , 500);
@@ -173,6 +167,7 @@ function drawWitch() {
 		}
 	
 function drawBats(){       	
+			changebat.xBack -= 7;
 			ctx.drawImage(bat, changebat.xBack +700,height.ht ,75 , 75);
 			ctx.drawImage(bat, changebat.xBack +850,height1.ht ,75 , 75);
 			ctx.drawImage(bat, changebat.xBack +1000,height2.ht ,75 , 75);
@@ -187,9 +182,9 @@ function drawPumpkins() {
 
 					if(target1[i])
 						{
-						ctx.drawImage(pumpkin, changebg.xBack +620 + k1,fruit1.arr+tY ,25 ,25);
+						ctx.drawImage(pumpkin, changebg.xBack +650 + k1,fruit1.arr+tY ,25 ,25);
 							
-							if((changebg.xBack+620+k1)<70 && (changebg.xBack+620+k1)>0)			//subtract x axis of witch to compare
+							if((changebg.xBack+650+k1)<70 && (changebg.xBack+650+k1)>0)			//subtract x axis of witch to compare
 							{
 								if((broomht.shipY-fruit1.arr)<50 && (broomht.shipY-fruit1.arr)>-100)
 								{
@@ -202,8 +197,7 @@ function drawPumpkins() {
 					if(target2[i])
 						{
 						ctx.drawImage(pumpkin, changebg.xBack +800 + k2,fruit2.arr+tY ,25 ,25);
-						alert(changebg.xBack +800 + k2);
-						
+											
 						if((changebg.xBack+800+k2)<100 && (changebg.xBack+800+k2)>0)		//subtract x axis of witch to compare
 							{
 								if((broomht.shipY-fruit2.arr)<50 && (broomht.shipY-fruit2.arr)>-100)
