@@ -117,7 +117,14 @@ border-radius:10px;
     var fruit2 = new points();
 
     var target1 = [1,1,1,1],target2 = [1,1,1,1] ,targetX = [], targetY = [], targetSpeed = 1.5, phase = 0.1, targets=4;
-	var collide = [1,1,1], l=0, m=0, bingo=1, y1=0, y2=0;
+	var collide = [1,1,1], l=0, m=0, n=0, bingo=1, y1=0, y2=0;
+	var bat_collide1=[],bat_collide2=[];
+	for(var t=0;t<20;t++)
+	{
+		bat_collide1[i]=0;
+		if(i<15)
+			bat_collide2[i]=0;
+	}
 	
     var d = new Date();
     var dnw = new Date();
@@ -138,10 +145,6 @@ border-radius:10px;
     var pumpkin_collect_Ready = false;
     var pumpkin_collect_image = new Image();
 	
-/*	var bat =false;
-	var bat = new Image();
-*/
-
 	var lightReady = false;
 	var lightImage =new Image();
 
@@ -262,18 +265,19 @@ function animate() {
 		drawPumpkins();
 	    drawBats();
 		drawBullet();
-		//drawTarget();
         drawScore();
 		resetTargets();
 		
-		if(Math.random()*1000<5 && ( y1!=1 || y2!=1))	
+		if(Math.random()*1000<3 && y1!=1 && y2!=1)	
 		{
+			n=Math.random()*100+50;
 			colonyofbats();
 			y1=1;
 			y2=1;
 		}
 		if(y1==1||y2==1)
 			colonyofbats();
+			
         requestAnimFrame(function() {
             startTime = (new Date()).getTime();
             animate();
@@ -337,7 +341,7 @@ function drawBack() {
 function lightning()
 	{
 				
-				if(Math.random()*1000<500 && bingo==1)
+				if(Math.random()*1000<100 && bingo==1 && y1!=0 && y2!=0)
 				{
 					bingo=Math.random()*300+10;
 				}
@@ -459,9 +463,9 @@ function drawBats(){
 			};
        	changebat.xBack -= 7;
 				
+				ctx.drawImage(bat, changebat.xBack +750,height.ht ,40 , 40);
 				if(collide[0])
 				{
-					ctx.drawImage(bat, changebat.xBack +750,height.ht ,40 , 40);
 					if((changebat.xBack+750-broomht.shipX)<60 && (changebat.xBack+750-broomht.shipX)>-20)//subtract x axis of witch to compare
     						{
     						if((broomht.shipY-height.ht)<40 && (broomht.shipY-height.ht)>-60)
@@ -472,9 +476,9 @@ function drawBats(){
     							}
     						}
 				}
+				ctx.drawImage(bat, changebat.xBack +900,height1.ht ,40 , 40);
 				if(collide[1])
 				{
-					ctx.drawImage(bat, changebat.xBack +900,height1.ht ,40 , 40);
 				 	if((changebat.xBack+900-broomht.shipX)<60 && (changebat.xBack+900-broomht.shipX)>-20)//subtract x axis of witch to compare
     				{
     					if((broomht.shipY-height1.ht)<40 && (broomht.shipY-height1.ht)>-60)
@@ -485,9 +489,9 @@ function drawBats(){
     					}
     				}
 				}
+				ctx.drawImage(bat, changebat.xBack +1050,height2.ht ,40 , 40);
 				if(collide[2])
 				{
-					ctx.drawImage(bat, changebat.xBack +1050,height2.ht ,40 , 40);
 				 	if((changebat.xBack+1050-broomht.shipX)<60 && (changebat.xBack+1050-broomht.shipX)>-20)//subtract x axis of witch to compare
     				{
     					if((broomht.shipY-height2.ht)<40 && (broomht.shipY-height2.ht)>-60)
@@ -554,17 +558,13 @@ function drawBullet() {
         	pumpkin_bullet_image.src = "pumpkin_bullet.png";
             ctx.drawImage(pumpkin_bullet_image,  pumpkin_bullets[j].px,  pumpkin_bullets[j].py, 25, 25);
           }
-      
-    }
+      }
 
    
 function drawScore() {
-				/*if(sc.score<0)
-					witch swoopes down
-				*/
     			document.getElementById("scoreupdate").innerHTML="PUMPKINS :"+" "+sc.score;
                 document.getElementById("bar").style.width=(sc.score*5)+"px";
-    }
+		}
 	
 function resetTargets()
 	{
@@ -573,6 +573,12 @@ function resetTargets()
  				{
 					changesmallbat1.xBack += 1200;
 					y1=0;
+					for(var t=0;t<20;t++)
+					{
+						bat_collide1[i]=0;
+						if(i<15)
+						bat_collide2[i]=0;
+					}
 				}
 			if (changesmallbat2.xBack <= -1 * 1200)
  				{
@@ -652,31 +658,28 @@ function colonyofbats(){
 			for(var i=0;i<20;i++,r+=25)
     				{
 							if(i%3==0)
-							ctx.drawImage(smallbat1, changesmallbat1.xBack +750+ r ,100+ Math.random()*10 ,15 ,15);							
+							ctx.drawImage(smallbat1, changesmallbat1.xBack +750+ r ,n+ Math.random()*10 ,15 ,15);							
     						if(i%3==1)
-							ctx.drawImage(smallbat2, changesmallbat1.xBack +750+ r ,100+ Math.random()*10 ,15 ,15);
+							ctx.drawImage(smallbat2, changesmallbat1.xBack +750+ r ,n+ Math.random()*10 ,15 ,15);
     						if(i%3==2)
-							ctx.drawImage(smallbat3, changesmallbat1.xBack +750+ r ,100+ Math.random()*10 ,15 ,15);							
-							/*if((changebg.xBack+620+k1-broomht.shipX)<70 && (changebg.xBack+620+k1-broomht.shipX)>-20)//subtract x axis of witch to compare
+							ctx.drawImage(smallbat3, changesmallbat1.xBack +750+ r ,n+ Math.random()*10 ,15 ,15);							
+							
+							if((changesmallbat1.xBack+750+r-broomht.shipX)<40 && (changebg.xBack+750+r-broomht.shipX)>-10)//subtract x axis of witch to compare
     							{
-    								if((broomht.shipY-fruit1.arr)<50 && (broomht.shipY-fruit1.arr)>-100)
-    								{
-    									target1[i]=0;
-    									if(sc.score<100)
-											sc.score+=1;
-    								}
-    							}*/
+    								if((broomht.shipY-n)<50 && (broomht.shipY-n)>-20)
+											sc.score-=2;
+    							}
     				}
 				r=100;
 			if(y2!=0)
 			for(var i=0;i<15;i++,r+=25)
     				{
 							if(i%3==0)
-							ctx.drawImage(smallbat1, changesmallbat2.xBack +750+ r ,300+ Math.random()*10 ,15 ,15);							
+							ctx.drawImage(smallbat1, changesmallbat2.xBack +750+ r ,n+200+ Math.random()*10 ,15 ,15);							
     						if(i%3==1)
-							ctx.drawImage(smallbat2, changesmallbat2.xBack +750+ r ,300+ Math.random()*10 ,15 ,15);
+							ctx.drawImage(smallbat2, changesmallbat2.xBack +750+ r ,n+200+ Math.random()*10 ,15 ,15);
     						if(i%3==2)
-							ctx.drawImage(smallbat3, changesmallbat2.xBack +750+ r ,300+ Math.random()*10 ,15 ,15);							
+							ctx.drawImage(smallbat3, changesmallbat2.xBack +750+ r ,n+200+ Math.random()*10 ,15 ,15);							
 							/*if((changebg.xBack+620+k1-broomht.shipX)<70 && (changebg.xBack+620+k1-broomht.shipX)>-20)//subtract x axis of witch to compare
     							{
     								if((broomht.shipY-fruit1.arr)<50 && (broomht.shipY-fruit1.arr)>-100)
@@ -687,7 +690,7 @@ function colonyofbats(){
     								}
     							}*/
     				}
-}
+		}
      
 </script>
 </head>
@@ -714,11 +717,6 @@ function colonyofbats(){
 		<img id="bat2" style="display:none" src="Bat2.png" />
 		<img id="bat3" style="display:none" src="Bat3.png" />
 		
-		<!--<img id="light" style="display:none" />
-		<img id="cloud1" style="display:none" src="Clouds1.png" />
-		<img id="cloud2" style="display:none" src="Clouds2.png" />
-		<img id="cloud3" style="display:none" src="Clouds3.png" />
-		-->
-	<img id="back" style="display:none" src="BG4.png" />
+		<img id="back" style="display:none" src="BG4.png" />
 </body>
 </html>
