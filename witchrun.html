@@ -224,42 +224,14 @@ border-radius:10px;
     function animate() {
     	model();
         drawBack();
+		lightning();
 		drawbroom();
 		drawPumpkins();
 	    drawBats();
 		drawBullet();
 		//drawTarget();
         drawScore();
-				
-		// if background scrolled off screen, reset
-			if(changebat.xBack<-1200)
-				{
-					changebat.xBack += 1200;
-					collide=[1,1,1];
-					height.ht=Math.random()*200;
-					height1.ht=Math.random()*250;
-					height2.ht=Math.random()*300;
-				}
-			
-			if (changebg.xBack <= -1 * 1200)
-            	{
-					changebg.xBack += 1200;
-					
-					fruit1.arr=Math.random()*300+50;
-					fruit2.arr=Math.random()*300+50;
-					target1=[1,1,1,1];
-					target2=[1,1,1,1];
-				}
-				
-			
-			if(l%15==4)
-			document.getElementById("bat").src=document.getElementById("bat1").src;
-			if(l%15==8)
-			document.getElementById("bat").src=document.getElementById("bat2").src;
-			if(l%15==12)
-			document.getElementById("bat").src=document.getElementById("bat3").src;
-	
-			l++; m++;
+		resetTargets();		
 			
         requestAnimFrame(function() {
             startTime = (new Date()).getTime();
@@ -299,7 +271,7 @@ border-radius:10px;
         	   // pumpkin_bullets[j].exist= 0;
         	   }
         
-          } 
+			} 
         } 
           
           
@@ -322,8 +294,10 @@ border-radius:10px;
                     ctx.drawImage(back, changebg.xBack, 0 ,1200, 500);			//1200--> image width
                     // draw new copy at broomht.right edge of old copy
                     ctx.drawImage(back, changebg.xBack +1200 , 0 ,1200 , 500);
-				
+			}
 			
+	function lightning()
+	{
 			lightImage.onload = function () {
         	lightReady = true;
 				};
@@ -378,7 +352,7 @@ border-radius:10px;
 				}
 				if(Math.random()*200<3)
 				ctx.drawImage(lightImage, Math.random()*800, 0 ,50, 200);
-			}
+	}
 	
     function drawbroom() {
     	 // load sprite  
@@ -586,6 +560,39 @@ border-radius:10px;
     			document.getElementById("scoreupdate").innerHTML="PUMPKINS :"+" "+sc.score;
                 document.getElementById("bar").style.width=(sc.score*5)+"px";
     }
+	
+	function resetTargets()
+	{
+	// if background scrolled off screen, reset
+			if(changebat.xBack<-1200)
+				{
+					changebat.xBack += 1200;
+					collide=[1,1,1];
+					height.ht=Math.random()*200;
+					height1.ht=Math.random()*250;
+					height2.ht=Math.random()*300;
+				}
+			
+			if (changebg.xBack <= -1 * 1200)
+            	{
+					changebg.xBack += 1200;
+					
+					fruit1.arr=Math.random()*300+50;
+					fruit2.arr=Math.random()*300+50;
+					target1=[1,1,1,1];
+					target2=[1,1,1,1];
+				}
+				
+			
+			if(l%15==4)
+			document.getElementById("bat").src=document.getElementById("bat1").src;
+			if(l%15==8)
+			document.getElementById("bat").src=document.getElementById("bat2").src;
+			if(l%15==12)
+			document.getElementById("bat").src=document.getElementById("bat3").src;
+	
+			l++; m++;
+	}
      
 </script>
 </head>
