@@ -121,9 +121,9 @@ border-radius:10px;
 	var bat_collide1=[],bat_collide2=[];
 	for(var t=0;t<20;t++)
 	{
-		bat_collide1[i]=0;
+		bat_collide1[t]=0;
 		if(i<15)
-			bat_collide2[i]=0;
+			bat_collide2[t]=0;
 	}
 	
     var d = new Date();
@@ -265,8 +265,6 @@ function animate() {
 		drawPumpkins();
 	    drawBats();
 		drawBullet();
-        drawScore();
-		resetTargets();
 		
 		if(Math.random()*1000<3 && y1!=1 && y2!=1)	
 		{
@@ -277,6 +275,9 @@ function animate() {
 		}
 		if(y1==1||y2==1)
 			colonyofbats();
+			
+		resetTargets();
+		drawScore();
 			
         requestAnimFrame(function() {
             startTime = (new Date()).getTime();
@@ -575,9 +576,9 @@ function resetTargets()
 					y1=0;
 					for(var t=0;t<20;t++)
 					{
-						bat_collide1[i]=0;
+						bat_collide1[t]=0;
 						if(i<15)
-						bat_collide2[i]=0;
+						bat_collide2[t]=0;
 					}
 				}
 			if (changesmallbat2.xBack <= -1 * 1200)
@@ -658,37 +659,39 @@ function colonyofbats(){
 			for(var i=0;i<20;i++,r+=25)
     				{
 							if(i%3==0)
-							ctx.drawImage(smallbat1, changesmallbat1.xBack +750+ r ,n+ Math.random()*10 ,15 ,15);							
+							ctx.drawImage(smallbat1, changesmallbat1.xBack +750+ r ,n+10*Math.random() ,15 ,15);							
     						if(i%3==1)
-							ctx.drawImage(smallbat2, changesmallbat1.xBack +750+ r ,n+ Math.random()*10 ,15 ,15);
+							ctx.drawImage(smallbat2, changesmallbat1.xBack +750+ r ,n+10*Math.random() ,15 ,15);
     						if(i%3==2)
-							ctx.drawImage(smallbat3, changesmallbat1.xBack +750+ r ,n+ Math.random()*10 ,15 ,15);							
-							
-							if((changesmallbat1.xBack+750+r-broomht.shipX)<40 && (changebg.xBack+750+r-broomht.shipX)>-10)//subtract x axis of witch to compare
+							ctx.drawImage(smallbat3, changesmallbat1.xBack +750+ r ,n+10*Math.random() ,15 ,15);	
+							if((changesmallbat1.xBack+750+r-broomht.shipX)<50 && (changesmallbat1.xBack+750+r-broomht.shipX)>-20)
     							{
-    								if((broomht.shipY-n)<50 && (broomht.shipY-n)>-20)
-											sc.score-=2;
+    								if((broomht.shipY-n)<30 && (broomht.shipY-n)>-70 && bat_collide1[i]==0)
+											{
+												sc.score=sc.score-2;
+												bat_collide1[i]=1;
+											}
     							}
     				}
-				r=100;
+			r=Math.random()*50+50;
 			if(y2!=0)
 			for(var i=0;i<15;i++,r+=25)
     				{
 							if(i%3==0)
-							ctx.drawImage(smallbat1, changesmallbat2.xBack +750+ r ,n+200+ Math.random()*10 ,15 ,15);							
+							ctx.drawImage(smallbat1, changesmallbat2.xBack +750+ r ,n+200+10*Math.random() ,15 ,15);							
     						if(i%3==1)
-							ctx.drawImage(smallbat2, changesmallbat2.xBack +750+ r ,n+200+ Math.random()*10 ,15 ,15);
+							ctx.drawImage(smallbat2, changesmallbat2.xBack +750+ r ,n+200+10*Math.random() ,15 ,15);
     						if(i%3==2)
-							ctx.drawImage(smallbat3, changesmallbat2.xBack +750+ r ,n+200+ Math.random()*10 ,15 ,15);							
-							/*if((changebg.xBack+620+k1-broomht.shipX)<70 && (changebg.xBack+620+k1-broomht.shipX)>-20)//subtract x axis of witch to compare
-    							{
-    								if((broomht.shipY-fruit1.arr)<50 && (broomht.shipY-fruit1.arr)>-100)
-    								{
-    									target1[i]=0;
-    									if(sc.score<100)
-											sc.score+=1;
-    								}
-    							}*/
+							ctx.drawImage(smallbat3, changesmallbat2.xBack +750+ r ,n+200+10*Math.random() ,15 ,15);							
+							
+							if((changesmallbat2.xBack+750+r-broomht.shipX)<50 && (changesmallbat2.xBack+750+r-broomht.shipX)>-10)
+    							{	
+										if((broomht.shipY-n-200)<30 && (broomht.shipY-n-200)>-70 && bat_collide2[i]==0)
+											{
+												sc.score=sc.score-2;
+												bat_collide2[i]=1;
+											}
+    							}
     				}
 		}
      
