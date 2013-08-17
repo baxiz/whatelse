@@ -82,11 +82,11 @@ border-radius:10px;
     		this.theta;
     }
 
-    var points = function(){
+    var points = function(){				//for height of pumpkins
     		this.arr=Math.random()*350+50;
     }
 
-    var collected= function(){
+    var collected= function(){				// storing points
     		this.score=10;
     }
 
@@ -96,10 +96,7 @@ border-radius:10px;
     	this.v;
     	this.theta;
     	}
-    
-    var pumpkin_bullets = [];
-    pumpkin_bullets[0] = new pumpkinhit(0,0,0.1,0); 
-    
+    	
     var pumpkin = new pumpkinhit(); 
     var broomht = new broom();
 	
@@ -115,14 +112,15 @@ border-radius:10px;
     var fruit2 = new points();
 
     var target1 = [1,1,1,1],target2 = [1,1,1,1] ,targetX = [], targetY = [], targetSpeed = 1.5, phase = 0.1, targets=4;
-	var collide = [1,1,1],l=0,m=0,bingo=1;
 	
+	var collide = [1,1,1],l=0,m=0,bingo=1;		//l,m -->counter variables			
+												//collide, target1, target2 --> to check if collision with bats and pumpkins respectively
     var d = new Date();
     var dnw = new Date();
     var startTime,time;
     var deg = 45;
+    var te = 0.1;
     var i = 0; 
-    var k = 0;  
      
     // broom 
     var broomReady = false;
@@ -155,15 +153,15 @@ border-radius:10px;
     	  broomht.isp = 0.01;
     	  if (e.keyCode == 39){broomht.right = true ; broomht.direction = 'broomht.right'; broomht.accx = 2; broomht.isp = broomht.isp + 0.001;}
     	  if (e.keyCode == 37){broomht.left = true; broomht.direction = 'broomht.left'; broomht.accx = 2;    broomht.isp = broomht.isp + 0.001;}
-    	  if (e.keyCode == 38){broomht.up = true; broomht.direction = 'broomht.up'; broomht.accy = 2;        broomht.isp = broomht.isp + 0.001;}
-      	  if (e.keyCode == 40){broomht.down = true; broomht.direction = 'broomht.down'; broomht.accy = 2;    broomht.isp = broomht.isp + 0.001;}
+    	  if (e.keyCode == 40){broomht.up = true; broomht.direction = 'broomht.up'; broomht.accy = 2;        broomht.isp = broomht.isp + 0.001;}
+      	  if (e.keyCode == 38){broomht.down = true; broomht.direction = 'broomht.down'; broomht.accy = 2;    broomht.isp = broomht.isp + 0.001;}
     	}
 
     function onKeyUp(e) {
     	  if (e.keyCode == 39) broomht.right = false;  
     	  if (e.keyCode == 37) broomht.left = false;
-    	  if (e.keyCode == 38) broomht.up = false;
-    	  if (e.keyCode == 40) broomht.down = false;
+    	  if (e.keyCode == 40) broomht.up = false;
+    	  if (e.keyCode == 38) broomht.down = false;
     	}
 
     /*
@@ -197,7 +195,7 @@ border-radius:10px;
            animate();
            //can.addEventListener("mousemove",move, false);
            //can.addEventListener("touchmove",tMove, false);
-           addEventListener("mouseup",newBullet, false);
+           can.addEventListener("mouseup",newBullet, false);
            addEventListener('keydown',onKeyDown,false);
            addEventListener('keyup',onKeyUp,false);
            time = d.getTime();
@@ -207,20 +205,20 @@ border-radius:10px;
                 for (i = 0; i < targets; i++)
                     targetY[i] = i * Math.PI / 2;
            }
-    
-  function newBullet(e) {
+     
+    function newBullet(e) {
     	
-    	pumpkin_bullets.push(new pumpkinhit(0,0,0.1,0));  	
-        // create a new pumpkin 
-        sc.score-=1;
-        pumpkin_bullets[k].px = broomht.shipX + 35;
-    	pumpkin_bullets[k].py = broomht.shipY + 10;
-        pumpkin_bullets[k].tlapse = 0;
-        pumpkin_bullets[k].exist = 1;
-        k++;
-    	  
-    }
-  
+    	//pumpkin_array[0].px = 35;
+    	//pumpkin_array[0].py = broomht.shipY + 10; 
+    	
+		sc.score-=1;
+    	pumpkin.px = broomht.shipX + 35;
+        pumpkin.py = broomht.shipY + 10;
+        te = 0;
+
+		//bullet.push(pumpkin.px); 
+     }
+     
     function animate() {
     	model();
         drawBack();
@@ -252,11 +250,11 @@ border-radius:10px;
 				}
 				
 			
-			if(l%15==4)
+			if(l%15==5)
 			document.getElementById("bat").src=document.getElementById("bat1").src;
-			if(l%15==8)
+			if(l%15==10)
 			document.getElementById("bat").src=document.getElementById("bat2").src;
-			if(l%15==12)
+			if(l%15==14)
 			document.getElementById("bat").src=document.getElementById("bat3").src;
 	
 			l++; m++;
@@ -271,38 +269,25 @@ border-radius:10px;
      
     function model() {
         // if there is a pumpkin, advance it 
-        // if (pumpkin_bullets[0].px)
-        
+        if (pumpkin.px)
+        { 
           var speed = 3500;
           var gravity = 250;
-          var t  = time/1000;
-          var j = 0
+          var t = time/1000;
           
-       for(j = 0; j < pumpkin_bullets.length; j++ )
-        { 
-         
-          if (pumpkin_bullets[j].px)
-          { 
-        	  
-        	pumpkin_bullets[j].px =  pumpkin_bullets[j].px + speed*t;
-            pumpkin_bullets[j].py =  pumpkin_bullets[j].py + (0.5*gravity*Math.pow(pumpkin_bullets[j].tlapse,2));
-            pumpkin_bullets[j].tlapse = pumpkin_bullets[j].tlapse + 0.004;
-       
-            if (pumpkin_bullets[j].px > can.width)
-        	   {
-            	pumpkin_bullets[j].px = 0;
-                // pumpkin_bullets[j].exist= 0;
-        	   }
-            if (pumpkin_bullets[j].py > can.height)
-        	   {
-            	pumpkin_bullets[j].tlapse = 0;
-        	   // pumpkin_bullets[j].exist= 0;
-        	   }
+            pumpkin.px = pumpkin.px + speed*t;
+            pumpkin.py = pumpkin.py + (0.5*gravity*te*te);
+            te = te + 0.004;
+           //   pumpkin.py = startY - ( v0y * t - (1/2 * g * Math.pow(t,2)) ); 
+  
+         }
+        // if the pumpkin goes off the right edge, zero it 
+        if (pumpkin.px > can.width)
+             pumpkin.px = 0;
+        if (pumpkin.py > can.height)
+             te = 0;
+    
         
-          } 
-        } 
-          
-          
         for (i = 0; i < targets; i++) {
                 targetX[i] -= targetSpeed;
                 targetY[i] += phase;
@@ -312,9 +297,9 @@ border-radius:10px;
         // if last target off left edge of screen, 
         // generate new set 
         if (targetX[targets - 1] < 0)
-            newTargets();
-        
+            newTargets();  
     }
+
      
     function drawBack() {
 					// pan background                
@@ -379,12 +364,12 @@ border-radius:10px;
 				if(Math.random()*200<3)
 				ctx.drawImage(lightImage, Math.random()*800, 0 ,50, 200);
 			}
-	
+		    		
     function drawbroom() {
     	 // load sprite  
         var t  = time/1000;
         var speed = 3500;
-        var slow = 1.01-broomht.isp;
+        var slow = 1.03-broomht.isp;
         broomimage.onload = function () {
         	broomReady = true;
         };
@@ -392,79 +377,26 @@ border-radius:10px;
         
         	  
         	 // for broomht.direction movement 
-        	   if (broomht.right) 
-        	   {
-        		   if(broomht.shipX > can.width-70)
-        		      broomht.shipX += 0; 
-        	      else
-        		      broomht.shipX += speed*t;
-        	   }
+        	   if (broomht.right) broomht.shipX += speed*t;
             else 
-               if (broomht.left)  
-               {
-            	   if(broomht.shipX < 20)
-            	      broomht.shipX += 0; 
-            	   else 
-            	      broomht.shipX -= speed*t;
-               }
+               if (broomht.left) broomht.shipX -= speed*t;
             else
-        	   if (broomht.up)    
-        	   {
-        		   if(broomht.shipY < 10)
-        		      broomht.shipY += 0;
-        		  
-        	       else 
-        		      broomht.shipY -= speed*t;
-        	   }
+        	   if (broomht.up) broomht.shipY += speed*t;
             else 
-               if (broomht.down) 
-               {
-            	   if(broomht.shipY > can.height-80)
-                     broomht.shipY += 0;
-                   else 
-            	      broomht.shipY += speed*t;
-               }
-               
-        	 
+               if (broomht.down) broomht.shipY -= speed*t;
+        	   
         	   // for inertia 
-        	      if (!broomht.right && broomht.direction == 'broomht.right') 
-        	      { 
-        	    	  if(broomht.shipX >= can.width-70)
-        		      broomht.shipX += 0; 
-        	      else 
-        	    	  broomht.shipX += broomht.accx; slow = 1.05-broomht.isp; broomht.accx = broomht.accx/slow;
-        	    	  }
+        	      if (!broomht.right && broomht.direction == 'broomht.right') {broomht.shipX += broomht.accx; slow = 1.05-broomht.isp; broomht.accx = broomht.accx/slow;}
                else 
-                  if (!broomht.left && broomht.direction == 'broomht.left') 
-                  {
-               	    if(broomht.shipX <= 20)
-             	       broomht.shipX += 0; 
-             	    else 
-             		   broomht.shipX -= broomht.accx; slow = 1.05-broomht.isp; broomht.accx = broomht.accx/slow;
-             		   }
+                  if (!broomht.left && broomht.direction == 'broomht.left') {broomht.shipX -= broomht.accx; slow = 1.05-broomht.isp; broomht.accx = broomht.accx/slow;}
                else
-           	      if (!broomht.up && broomht.direction == 'broomht.up') 
-           	      { 
-           	    	  if(broomht.shipY <= 10)
-           	            broomht.shipY += 0;
-           	          else 
-           	          { broomht.shipY -= broomht.accy; slow = 1.05-broomht.isp; broomht.accy = broomht.accy/slow;
-           	    	    broomht.shipX -= broomht.accy;
-           	    	    }
-           	      }
+           	      if (!broomht.up && broomht.direction == 'broomht.up') {broomht.shipY += broomht.accy; slow = 1.05-broomht.isp; broomht.accy = broomht.accy/slow;}
                else 
-                  if (!broomht.down && broomht.direction == 'broomht.down') 
-                  {
-                	  if(broomht.shipY >= can.height-80)
-                          broomht.shipY += 0;
-                       else
-                    	  broomht.shipY += broomht.accy; slow = 1.05-broomht.isp; broomht.accy = broomht.accy/slow;
-                    	   }
+                  if (!broomht.down && broomht.direction == 'broomht.down') {broomht.shipY -= broomht.accy; slow = 1.05-broomht.isp; broomht.accy = broomht.accy/slow;}
 
         ctx.drawImage(broomimage, broomht.shipX, broomht.shipY, 75, 75);
 
     		}
-    
     	
     function drawBats(){       	
 		bat.onload = function () {
@@ -474,14 +406,13 @@ border-radius:10px;
 				
 				if(collide[0])
 				{
-					ctx.drawImage(bat, changebat.xBack +750,height.ht ,40 , 40);
+					ctx.drawImage(bat, changebat.xBack +750,height.ht ,45 , 45);
 					if((changebat.xBack+750-broomht.shipX)<60 && (changebat.xBack+750-broomht.shipX)>-20)//subtract x axis of witch to compare
     						{
     						if((broomht.shipY-height.ht)<40 && (broomht.shipY-height.ht)>-60)
     							{
     								collide[0]=0;
-    								if(sc.score<100)
-										sc.score-=5;
+									sc.score-=5;
     							}
     						}
 				}
@@ -493,8 +424,7 @@ border-radius:10px;
     					if((broomht.shipY-height1.ht)<40 && (broomht.shipY-height1.ht)>-60)
     					{
     						collide[1]=0;
-    						if(sc.score<100)
-								sc.score-=5;
+							sc.score-=5;
     					}
     				}
 				}
@@ -506,8 +436,7 @@ border-radius:10px;
     					if((broomht.shipY-height2.ht)<40 && (broomht.shipY-height2.ht)>-60)
     					{
     						collide[2]=0;
-    						if(sc.score<100)
-								sc.score-=5;
+							sc.score-=5;
     					}
     				}
 				}
@@ -561,22 +490,20 @@ border-radius:10px;
     					k2+=30;
     				}
     		}
-    
-    
+    		  
     function drawBullet() {
-    	for(j = 0; j < pumpkin_bullets.length ; j++ ) 
-    	  if (pumpkin_bullets[j].px)
-          { 
+        if (pumpkin.px)
+          { 	//ctx.fillRect(pumpkin.px, pumpkin.py, 2, 1);
+        
             pumpkin_bullet_image.onload = function () {
         	pumpkin_bullet_Ready = true;
             };
             
-        	pumpkin_bullet_image.src = "pumpkin_bullet.png";
-            ctx.drawImage(pumpkin_bullet_image,  pumpkin_bullets[j].px,  pumpkin_bullets[j].py, 25, 25);
-          }
-      
+        	pumpkin_bullet_image.src = "pumpkin_hit.png";
+        	
+        ctx.drawImage(pumpkin_bullet_image, pumpkin.px, pumpkin.py, 25, 25);
+		 }
     }
-
    
 	function drawScore() {
 				/*if(sc.score<0)
