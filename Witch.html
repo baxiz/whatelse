@@ -2,42 +2,23 @@
 <html>
 <head>
     <title>Witch Run</title>
-<!--    <link href="http://fonts.googleapis.com/css?family=Creepster" rel="stylesheet" type="text/css">	-->
+	<link href="http://fonts.googleapis.com/css?family=Creepster" rel="stylesheet" type="text/css">
 	<meta name="viewport" content="width=600" />
 <style>
-#scoreupdate{
-width:200px;
-background-color:#000000;
-color:#c24100;
-font-size:25px;
-font-family:"Creepster";
-padding-top:15px;
-text-align:center;
-}
-
 #barupdate{
 float:right;
-width:500px;
 background-color:#000000;
-color:#c24100;
-font-size:25px;
+width:40px;
+height:500px;
+border-radius:10px;
+overflow:hidden;
 }
-
-.center{
-width:800px;
-margin:0 auto;
-margin-top:5px;
-background-color:#000000;
-padding-bottom:20px;
-}
-
 #bar{
-margin:-28px 20px 0px 0px;
-float:right;
-width:0px;
-height:30px;
+margin-top:450px;
+width:40px;
 background-color:#c24100;
-transition:width 3s;
+transition:height 3s;
+transition:margin 3s;
 border-radius:10px;
 }
 </style>
@@ -51,7 +32,7 @@ border-radius:10px;
     	};
     })();
 
-    var can, ctx, back; //for canvas and drawimage 
+    var can, ctx, back; 					//for canvas and drawimage 
 
     var broom=function() {					//has coords of broom 
     		this.shipX=10;
@@ -79,7 +60,7 @@ border-radius:10px;
     		this.theta;
     }
 
-    var points = function(){
+    var points = function(){				//for ht. of pumpkins to be collected
     		this.arr=Math.random()*350+50;
     }
 
@@ -92,15 +73,15 @@ border-radius:10px;
     	this.py;
     	this.v;
     	this.theta;
-    	}
+    }
     
     var ghost = function (){
     	
-    	this.gx = 550;
-    	this.gy = 20;
-    	this.v;
-    	
-    }
+    	this.gx = 800;
+    	this.gy = 350;
+    	this.v=1;	
+		this.collide=0;
+	}
     
     
     var batht=function() {					//for height of bats appearing			
@@ -111,7 +92,7 @@ border-radius:10px;
 	}
  
     
-    var big_bat = [];
+    var big_bat = [];						//array of objects for big bats
     for(var bb = 0 ; bb<3 ; bb++)
     	{big_bat[bb] = new batht;
     	 big_bat[bb].pos_space = 750 + (bb*150);
@@ -141,7 +122,7 @@ border-radius:10px;
     var fruit2 = new points();
 
     var target1 = [1,1,1,1],target2 = [1,1,1,1] ,targetX = [], targetY = [], targetSpeed = 1.5, phase = 0.1, targets=4;
-	var l=0, m=0, n=0, bingo=1, y1=0, y2=0;
+	var l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0;			//l,m,n -->counter variables
 	var bat_collide1=[],bat_collide2=[];
 	
 	for(var t=0;t<20;t++)
@@ -180,6 +161,9 @@ border-radius:10px;
 	var thunderImage2 = new Image();
 	var thunderReady3 = false;
 	var thunderImage3 = new Image();
+	
+	var ghostready = false;
+	var ghostimage =new Image();
 	
     // to move broom 
 function onKeyDown(e) {
@@ -291,6 +275,11 @@ function loadimages(){
 		pumpkin_collect_Ready = true;
         };      
 		pumpkin_collect_image.src = "pumpkin_hit.png";
+		
+		ghostimage.onload = function () {
+		ghostready = true;
+        };      
+		ghostimage.src = "ghost.png";
 	}
     
 function newBullet(e) {
@@ -317,14 +306,12 @@ function destroyBullet()
          	pumpkin_bullets[j].px = 0;
           	pumpkin_bullets.splice(index, 1);
             k--;
-       
 	      }
          if (pumpkin_bullets[j].py > can.height)
 	     {
     	   pumpkin_bullets[j].tlapse = 0;
     	   pumpkin_bullets.splice(index, 1);
     	   k--;
-	  
 	     }
       }
 
@@ -343,7 +330,7 @@ function animate() {
 		hitbats();
 		destroyBullet();
 		
-		if(Math.random()*1000<3 && y1!=1 && y2!=1)	
+		if(Math.random()*1000<1 && y1!=1 && y2!=1)	
 		{
 			n=Math.random()*100+50;
 			colonyofbats();
@@ -352,6 +339,12 @@ function animate() {
 		}
 		if(y1==1||y2==1)
 			colonyofbats();
+			
+		if(Math.random()*5000<20 && changebg.xBack>-700)
+			ghosts();
+		
+		if(p==1)
+				ghosts();
 			
 		resetTargets();
 		drawScore();
@@ -414,8 +407,7 @@ function drawBack() {
 			
 function lightning()
 	{
-				
-				if(Math.random()*1000<100 && bingo==1 && y1!=0 && y2!=0)
+				if(Math.random()*1000<10 && bingo==1 && y1!=0 && y2!=0)
 				{
 					bingo=Math.random()*300+10;
 				}
@@ -569,7 +561,7 @@ function hitbats()
 		
 	if(big_bat[bb].exist)
 	{ 
-	   if((changebat.xBack+big_bat[bb].pos_space-pumpkin_bullets[j].px)<40 && (changebat.xBack+big_bat[bb].pos_space-pumpkin_bullets[j].px)>-20 )//subtract x axis of bullet to compare 
+	   if((changebat.xBack+big_bat[bb].pos_space-pumpkin_bullets[j].px)<40 && (changebat.xBack+big_bat[bb].pos_space-pumpkin_bullets[j].px)>-20 )
 				{
 				if((pumpkin_bullets[j].py-big_bat[bb].ht)<20 && (pumpkin_bullets[j].py-big_bat[bb].ht)>-40)
 					{ 
@@ -582,21 +574,16 @@ function hitbats()
 				}
 	   
 	}
-	
-	}
-   		
-	
+	}	
 }
     	
 function drawBats(){   
-	
-	
+
 		bat.onload = function () {
         	batReady = true;
 			};
        	changebat.xBack -= 7;
-				
-      
+
        	for (var bb = 0 ; bb<3 ; bb++)
        	{
 		  if(big_bat[bb].exist)
@@ -609,11 +596,8 @@ function drawBats(){
 								sc.score-=5;
 						}
 					}
-        }
-		  
+        }  
        	} 
-       	
-   
    }
     		
 function drawPumpkins() {        	
@@ -674,8 +658,8 @@ function drawBullet() {
      
          
 function drawScore() {
-    			document.getElementById("scoreupdate").innerHTML="PUMPKINS :"+" "+sc.score;
-                document.getElementById("bar").style.width=(sc.score*5)+"px";
+            document.getElementById("bar").style.height=(sc.score*5)+"px";
+			document.getElementById("bar").style.marginTop=(500-sc.score*5)+"px";
 		}
 	
 function resetTargets()  // make changes   
@@ -705,15 +689,16 @@ function resetTargets()  // make changes
 				  		{big_bat[bb].exist = 1;
 				  	     big_bat[bb].ht = Math.random()*250+bb*50;
 				  	     big_bat[bb].broomcol = 1;
-				  		}
-					
+				  		}	
 				}
-			
-	
 			
 			if (changebg.xBack <= -1 * 1200)
             	{
 					changebg.xBack += 1200;
+					
+					ghostspawn.gy=350;
+					ghostspawn.collide=0;
+					p=0;
 					
 					fruit1.arr=Math.random()*300+50;
 					fruit2.arr=Math.random()*300+50;
@@ -809,22 +794,35 @@ function colonyofbats(){
     							}
     				}
 		}
+
+function ghosts()
+	{
+	    	p=1;
+			ctx.drawImage(ghostimage, changebg.xBack+ghostspawn.gx, ghostspawn.gy ,50 ,50);
+			ghostspawn.gy-=ghostspawn.v;
+			
+			if((changebg.xBack+ghostspawn.gx-broomht.shipX)<50 && (changebg.xBack+ghostspawn.gx-broomht.shipX)>-10)
+    			{	
+				alert(broomht.shipY-ghostspawn.gy);
+				if((broomht.shipY-ghostspawn.gy)<40 && (broomht.shipY-ghostspawn.gy)>-70 && ghostspawn.collide==0)
+					{
+						alert();
+						ghostspawn.collide=1;
+					}
+    			}
+	}
      
 </script>
 </head>
 
 <body onload="init()">
-	<div style="width:800px;margin:0 auto;">
+<div style="width:845px;margin:0 auto;">
     <canvas id="can" height="500" width="800">
     </canvas>
-	</div>
-	
-	<div class="center">
-	<div id="scoreupdate"></div>
 	<div id="barupdate">
 	<div id="bar"></div>
 	</div>
-	</div>
+</div>
     
 		<img id="bat" style="display:none" src="Bat1.png" />
 		<img id="smallbat1" style="display:none"/>
