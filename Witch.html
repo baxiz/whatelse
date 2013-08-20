@@ -122,7 +122,7 @@ border-radius:10px;
     var fruit2 = new points();
 
     var target1 = [1,1,1,1],target2 = [1,1,1,1] ,targetX = [], targetY = [], targetSpeed = 1.5, phase = 0.1, targets=4;
-	var l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0;			//l,m,n -->counter variables
+	var l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0, prob=0, chkstat=0;			//l,m,n -->counter variables
 	var bat_collide1=[],bat_collide2=[];
 	
 	for(var t=0;t<20;t++)
@@ -287,7 +287,7 @@ function newBullet(e) {
 		{
     	pumpkin_bullets.push(new pumpkinhit(0,0,0.1,0));  	
         // create a new pumpkin 
-        sc.score-=1;
+		sc.score-=1;
         pumpkin_bullets[k].px = broomht.shipX + 35;
     	pumpkin_bullets[k].py = broomht.shipY + 10;
         pumpkin_bullets[k].tlapse = 0;
@@ -340,14 +340,15 @@ function animate() {
 		if(y1==1||y2==1)
 			colonyofbats();
 			
-		if(Math.random()*5000<20 && changebg.xBack>-700)
+		if(Math.random()*5000<10 && changebg.xBack>-700)
 			ghosts();
 		
 		if(p==1)
-				ghosts();
+			ghosts();
 			
 		resetTargets();
 		drawScore();
+		checkstatus();
 			
         requestAnimFrame(function() {
             startTime = (new Date()).getTime();
@@ -393,8 +394,7 @@ function model() {
         // if last target off left edge of screen, 
         // generate new set 
         if (targetX[targets - 1] < 0)
-            newTargets();
-        
+            newTargets();   
     }
      
 function drawBack() {
@@ -567,7 +567,7 @@ function hitbats()
 					{ 
 					    big_bat[bb].exist = 0;
 						if(sc.score<100)
-							sc.score+=10;
+							sc.score+=5;
 					     	pumpkin_bullets.splice(index, 1);
 						k--;
 					}
@@ -582,7 +582,7 @@ function drawBats(){
 		bat.onload = function () {
         	batReady = true;
 			};
-       	changebat.xBack -= 7;
+       	changebat.xBack -= changebg.xIncr+3;
 
        	for (var bb = 0 ; bb<3 ; bb++)
        	{
@@ -591,9 +591,9 @@ function drawBats(){
 			if((changebat.xBack+big_bat[bb].pos_space-broomht.shipX)<60 && (changebat.xBack+big_bat[bb].pos_space-broomht.shipX)>-20 && big_bat[bb].broomcol)//subtract x axis of witch to compare 
 					{
 					if((broomht.shipY-big_bat[bb].ht)<40 && (broomht.shipY-big_bat[bb].ht)>-60)
-						{ big_bat[bb].broomcol = 0;
-							if(sc.score<100)
-								sc.score-=5;
+						{ 
+							big_bat[bb].broomcol = 0;
+							sc.score-=5;
 						}
 					}
         }  
@@ -656,12 +656,36 @@ function drawBullet() {
           }
       }
      
-         
 function drawScore() {
-            document.getElementById("bar").style.height=(sc.score*5)+"px";
+			if(l%200==5)sc.score-=1;
+			
+			if(sc.score>100) sc.score=100;
+			else if(sc.score<0) sc.score=0;
+			if(prob==1 && sc.score<30)
+				prob=0;
+			if(sc.score>30 && prob==0)
+			{	
+				prob=1;
+				changebg.xIncr++;
+			}
+			document.getElementById("bar").style.height=(sc.score*5)+"px";
 			document.getElementById("bar").style.marginTop=(500-sc.score*5)+"px";
 		}
-	
+
+function checkstatus(){
+		if(sc.score>0)chkstat=0;
+		else if(chkstat==0 && sc.score==0)
+			chkstat=l;
+		if(l-chkstat>500 && chkstat!=0 && sc.score==0)
+		{
+			lose();
+		}	
+	}
+///////////////////////////////////////////////////////////	
+function lose{
+
+	}
+///////////////////////////////////////////////////////////	
 function resetTargets()  // make changes   
 	{
 	// if background scrolled off screen, reset 
@@ -706,21 +730,21 @@ function resetTargets()  // make changes
 					target2=[1,1,1,1];
 				}				
 			
-			if(l%15==4)
+			if(l%10==3)
 			{
 				document.getElementById("bat").src=document.getElementById("bat1").src;
 				document.getElementById("smallbat1").src=document.getElementById("bat1").src;
 				document.getElementById("smallbat2").src=document.getElementById("bat2").src;
 				document.getElementById("smallbat3").src=document.getElementById("bat3").src;
 			}
-			else if(l%15==8)
+			else if(l%10==6)
 			{
 				document.getElementById("bat").src=document.getElementById("bat2").src;
 				document.getElementById("smallbat1").src=document.getElementById("bat2").src;
 				document.getElementById("smallbat2").src=document.getElementById("bat3").src;
 				document.getElementById("smallbat3").src=document.getElementById("bat1").src;
 			}
-			else if(l%15==12)
+			else if(l%10==9)
 			{
 				document.getElementById("bat").src=document.getElementById("bat3").src;
 				document.getElementById("smallbat1").src=document.getElementById("bat3").src;
@@ -752,8 +776,8 @@ function resetTargets()  // make changes
 	}
 
 function colonyofbats(){
-			changesmallbat1.xBack-=10;
-			changesmallbat2.xBack-=10;
+			changesmallbat1.xBack-=changebg.xIncr+5;
+			changesmallbat2.xBack-=changebg.xIncr+5;
 			var r=0;
 			if(y1!=0)
 			for(var i=0;i<20;i++,r+=25)
@@ -803,15 +827,12 @@ function ghosts()
 			
 			if((changebg.xBack+ghostspawn.gx-broomht.shipX)<50 && (changebg.xBack+ghostspawn.gx-broomht.shipX)>-10)
     			{	
-				alert(broomht.shipY-ghostspawn.gy);
-				if((broomht.shipY-ghostspawn.gy)<40 && (broomht.shipY-ghostspawn.gy)>-70 && ghostspawn.collide==0)
+				if((broomht.shipY-ghostspawn.gy)<40 && (broomht.shipY-ghostspawn.gy)>-70 && ghostspawn.collide==0) //what does the ghost do ?
 					{
-						alert();
 						ghostspawn.collide=1;
 					}
     			}
 	}
-     
 </script>
 </head>
 
