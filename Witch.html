@@ -18,13 +18,35 @@ margin-top:450px;
 width:40px;
 background-color:#c24100;
 transition:height 3s;
-transition:margin 3s;
+transition:margin 0s;
 border-radius:10px;
 }
 </style>
+</head>
+
+<body onload="init()">
+<div style="width:845px;margin:0 auto;">
+    <canvas id="can" height="500" width="800">
+    </canvas>
+	<div id="barupdate">
+	<div id="bar"></div>
+	</div>
+</div>
+    
+		<img id="bat" style="display:none" src="Bat1.png" />
+		<img id="smallbat1" style="display:none" />
+		<img id="smallbat2" style="display:none" />
+		<img id="smallbat3" style="display:none" />
+		
+		<img id="bat1" style="display:none" src="Bat1.png" />
+		<img id="bat2" style="display:none" src="Bat2.png" />
+		<img id="bat3" style="display:none" src="Bat3.png" />
+		
+		<img id="back" style="display:none" src="BG4.png" />
+</body>
 
 <script type="text/javascript">
-    
+window.onload=function(){
     window.requestAnimFrame = (function() {
     	return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
     	function(callback) {
@@ -67,6 +89,11 @@ border-radius:10px;
     var collected= function(){
     		this.score = 10;
     }
+	var points= function(){
+		this.startime;
+		this.endtime;
+		this.score;
+	}
 
     var pumpkinhit = function (){
     	this.px;
@@ -98,7 +125,6 @@ border-radius:10px;
     	 big_bat[bb].pos_space = 750 + (bb*150);
     	}
     
-    
     var pumpkin_bullets = [];
     for(var j = 0 ; j<3 ; j++)
     pumpkin_bullets[j] = new pumpkinhit(0,0,0.1,0); 
@@ -121,8 +147,10 @@ border-radius:10px;
 	var fruit1 = new points();
     var fruit2 = new points();
 
+	var finalscore=new points();
+	
     var target1 = [1,1,1,1],target2 = [1,1,1,1] ,targetX = [], targetY = [], targetSpeed = 1.5, phase = 0.1, targets=4;
-	var l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0, prob=0, chkstat=0;			//l,m,n -->counter variables
+	var l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0, chkstat=0, prob=1;			//l,m,n -->counter variables
 	var bat_collide1=[],bat_collide2=[];
 	
 	for(var t=0;t<20;t++)
@@ -181,64 +209,25 @@ function onKeyUp(e) {
     	  if (e.keyCode == 40 || e.keyCode == 83) broomht.down = false;
     	}
 
-    /*
-	// move ship in response to mouse
-    function move(e)
-    {
-        if (!e)
-            e = event;
-        broomht.shipY = e.pageY;
-        return false;
-    }
-
-    // move ship in response to touch
-    function tMove(e)
-    {
-        if (!e)
-            e = event;
-        broomht.shipY = e.touches[0].pageY;
-        return false;
-    }
-    
-	*/
-	/*addEventListener("keydown", function (e) {
-    broomht.isp = 0.01;
-	keysDown[e.keyCode] = true;
-	 if (e.keyCode == 39)
-	broomht.direction = 'broomht.right';
-	 if (e.keyCode == 37)
-	broomht.direction = 'broomht.left';
-	 if (e.keyCode == 38)
-	broomht.direction = 'broomht.up';
-	 if (e.keyCode == 40)
-	broomht.direction = 'broomht.down';
-	
-}, false);
-
-
-addEventListener("keyup", function (e) {
-	delete keysDown[e.keyCode];
-}, false);
-*/
-	
 function init() {
     	
 		   bat = document.getElementById("bat");
     	   back = document.getElementById("back");
            can = document.getElementById("can");
            ctx = can.getContext("2d");
-           ctx.font = "14pt Helvetica";
+           ctx.font = "18pt Creepster";
+		   ctx.fillStyle = '#c24100';
            newTargets();
 		   loadimages();
            animate();
-           //can.addEventListener("mousemove",move, false);
-           //can.addEventListener("touchmove",tMove, false);
-           addEventListener("mouseup",newBullet, false);
+           //addEventListener("mouseup",newBullet, false);
            addEventListener("keydown",newBullet, false);
            addEventListener('keydown',onKeyDown,false);
            addEventListener('keyup',onKeyUp,false);
            time = d.getTime();
-           }
+           
+		   finalscore.startime= (new Date()).getTime();
+		   }
      
 function newTargets() {
                 for (i = 0; i < targets; i++)
@@ -314,9 +303,7 @@ function destroyBullet()
     	   k--;
 	     }
       }
-
     }
-
 
 function animate() {
     	model();
@@ -354,23 +341,23 @@ function animate() {
             startTime = (new Date()).getTime();
             animate();
 			});
+			
           time = (new Date()).getTime() - startTime;
 		}
      
 function model() {
       
-          var speed = 3500;
+          var speed = 5;
           var gravity = 250;
           var t  = time/1000;
           var j = 0;
           
        for(j = 0; j < pumpkin_bullets.length; j++ )
         { 
-         
           if (pumpkin_bullets[j].px)
           { 
         	  
-        	pumpkin_bullets[j].px =  pumpkin_bullets[j].px + speed*t;
+        	pumpkin_bullets[j].px =  pumpkin_bullets[j].px + speed;
             pumpkin_bullets[j].py =  pumpkin_bullets[j].py + (0.5*gravity*Math.pow(pumpkin_bullets[j].tlapse,2));
             pumpkin_bullets[j].tlapse = pumpkin_bullets[j].tlapse + 0.004;
        
@@ -475,7 +462,6 @@ function drawbroom() {
     	   {
     		   if(broomht.shipY < 10)
     		      broomht.shipY += 0;
-    		  
     	       else 
     		      broomht.shipY -= speed*t;
     	   }
@@ -510,7 +496,6 @@ function drawbroom() {
     		 
     	   }
            
-    	 
     	   // for inertia 
     	      if (!broomht.right && broomht.direction == 'broomht.right') 
     	      { 
@@ -533,8 +518,7 @@ function drawbroom() {
        	    	  if(broomht.shipY <= 10)
        	            broomht.shipY += 0;
        	          else 
-       	           broomht.shipY -= broomht.accy; slow = 1.01; broomht.accy = broomht.accy/slow;
-       	    	   
+       	           broomht.shipY -= broomht.accy; slow = 1.01; broomht.accy = broomht.accy/slow;   
        	      }
            else 
               if (!broomht.down && broomht.direction == 'broomht.down') 
@@ -544,10 +528,8 @@ function drawbroom() {
                    else
                 	  broomht.shipY += broomht.accy; slow = 1.01; broomht.accy = broomht.accy/slow;
                 	   }
-            
-            
-    ctx.drawImage(broomimage, broomht.shipX, broomht.shipY, 75, 75);
-
+        
+		ctx.drawImage(broomimage, broomht.shipX, broomht.shipY, 75, 75);
 		}
 
 
@@ -642,7 +624,6 @@ function drawPumpkins() {
     				}
     		}
     
-    
 function drawBullet() {
     	for(j = 0; j < pumpkin_bullets.length ; j++ ) 
     	  if (pumpkin_bullets[j].px)
@@ -657,35 +638,38 @@ function drawBullet() {
       }
      
 function drawScore() {
-			if(l%200==5)sc.score-=1;
+			if(l%100==5)sc.score-=2;
 			
 			if(sc.score>100) sc.score=100;
 			else if(sc.score<0) sc.score=0;
-			if(prob==1 && sc.score<30)
-				prob=0;
-			if(sc.score>30 && prob==0)
-			{	
-				prob=1;
+			
+			if(finalscore.score>prob*300)	//increases speed of the game
+			{
+				prob++;	
 				changebg.xIncr++;
 			}
 			document.getElementById("bar").style.height=(sc.score*5)+"px";
 			document.getElementById("bar").style.marginTop=(500-sc.score*5)+"px";
 		}
 
-function checkstatus(){
+function checkstatus(){		
+		finalscore.score = ((((new Date()).getTime()-finalscore.startime)-(((new Date()).getTime()-finalscore.startime)%100))/100);
+		ctx.fillText(finalscore.score,700,480);
+		
 		if(sc.score>0)chkstat=0;
 		else if(chkstat==0 && sc.score==0)
 			chkstat=l;
-		if(l-chkstat>500 && chkstat!=0 && sc.score==0)
+		if(l-chkstat>250 && chkstat!=0 && sc.score==0)
 		{
+			finalscore.endtime=finalscore.score;
 			lose();
 		}	
 	}
-///////////////////////////////////////////////////////////	
-function lose{
+/*	
+function lose{			//tempalate after user loses
 
 	}
-///////////////////////////////////////////////////////////	
+*/	
 function resetTargets()  // make changes   
 	{
 	// if background scrolled off screen, reset 
@@ -770,7 +754,6 @@ function resetTargets()  // make changes
 				document.getElementById("smallbat2").src=document.getElementById("bat1").src;
 				document.getElementById("smallbat3").src=document.getElementById("bat2").src;
 			}
-			
 
 			l++; m++;
 	}
@@ -827,33 +810,14 @@ function ghosts()
 			
 			if((changebg.xBack+ghostspawn.gx-broomht.shipX)<50 && (changebg.xBack+ghostspawn.gx-broomht.shipX)>-10)
     			{	
-				if((broomht.shipY-ghostspawn.gy)<40 && (broomht.shipY-ghostspawn.gy)>-70 && ghostspawn.collide==0) //what does the ghost do ?
+				if((broomht.shipY-ghostspawn.gy)<40 && (broomht.shipY-ghostspawn.gy)>-70 && ghostspawn.collide==0)
 					{
 						ghostspawn.collide=1;
+						sc.score-=30;
 					}
     			}
 	}
+init();
+};
 </script>
-</head>
-
-<body onload="init()">
-<div style="width:845px;margin:0 auto;">
-    <canvas id="can" height="500" width="800">
-    </canvas>
-	<div id="barupdate">
-	<div id="bar"></div>
-	</div>
-</div>
-    
-		<img id="bat" style="display:none" src="Bat1.png" />
-		<img id="smallbat1" style="display:none"/>
-		<img id="smallbat2" style="display:none" />
-		<img id="smallbat3" style="display:none" />
-		
-		<img id="bat1" style="display:none" src="Bat1.png" />
-		<img id="bat2" style="display:none" src="Bat2.png" />
-		<img id="bat3" style="display:none" src="Bat3.png" />
-		
-		<img id="back" style="display:none" src="BG4.png" />
-</body>
 </html>
