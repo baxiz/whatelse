@@ -32,8 +32,6 @@ border-radius:10px;
 	<div id="bar"></div>
 	</div>
 </div>
-		<img id="broomimage"  src="sp.png" style="display:none;"/>
-
 		<img id="bat" style="display:none" src="Bat1.png" />
 		<img id="smallbat1" style="display:none" />
 		<img id="smallbat2" style="display:none" />
@@ -85,6 +83,7 @@ window.onload=function(){
 
     var points = function(){				//for ht. of pumpkins to be collected
     		this.arr=Math.random()*350+50;
+			this.target=new Array();
     }
 
     var collected= function(){
@@ -117,12 +116,19 @@ window.onload=function(){
         this.broomcol = 1;
 	}
  
-    var big_bat = [];						//array of objects for big bats
+    var big_bat = [];	//array of objects for big bats
+	var fruit = [];	
     for(var bb = 0 ; bb<4 ; bb++)
-    	{big_bat[bb] = new batht;
-    	 big_bat[bb].pos_space = 750 + (bb*150);
+    	{
+			fruit[bb] = new points;
+			fruit[bb].target = [1,1];	
     	}
-    
+    for(var bb = 0 ; bb<5 ; bb++)
+		{
+			big_bat[bb] = new batht;
+			big_bat[bb].pos_space = 750 + (bb*150);
+		}
+	
     var pumpkin_bullets = [];
     for(var j = 0 ; j<3 ; j++)
     pumpkin_bullets[j] = new pumpkinhit(0,0,0.1,0); 
@@ -167,8 +173,8 @@ window.onload=function(){
     var keysDown = {};
      
     // broom 
-    //var broomReady = false;
-    //var broomimage = new Image();
+    var broomReady = false;
+    var broomimage = new Image();
 
     //pumpkin bullet 
     var pumpkin_bullet_Ready = false;
@@ -233,11 +239,11 @@ function newTargets() {
 		   
 function loadimages(){
 	
-	    /*broomimage.onload = function () {
+	    broomimage.onload = function () {
 	    broomReady = true;
 	    };
 		broomimage.src = "sp.png";
-		*/
+		
 		lightImage.onload = function () {
        	lightReady = true;
 		};
@@ -534,7 +540,7 @@ function drawbroom() {
 function hitbats()
 {   var index;
 
-	for(var bb = 0; bb<4 ; bb++ )
+	for(var bb = 0; bb<5 ; bb++ )
 	for(j = 0; j < pumpkin_bullets.length ; j++ ) 
 	{
 	  index = pumpkin_bullets.indexOf(pumpkin_bullets[j]);
@@ -563,7 +569,7 @@ function drawBats(){
 			};
        	changebat.xBack -= changebg.xIncr+3;
 
-       	for (var bb = 0 ; bb<4 ; bb++)
+       	for (var bb = 0 ; bb<5 ; bb++)
        	{
 		  if(big_bat[bb].exist)
 		{  ctx.drawImage(bat, changebat.xBack +big_bat[bb].pos_space,big_bat[bb].ht ,40 ,40);
@@ -578,49 +584,29 @@ function drawBats(){
         }  
        	} 
    }
-    		
-function drawPumpkins() {        	
-    			var k1=fruit1.arr,k2=fruit2.arr;
-    			for(var i=0;i<5;i++)					// 4 targets in total
+
+function drawPumpkins() {        	    			
+				for(var p=0,k1=fruit[p].arr;p<4;k1=fruit[p].arr,p++)			//4 set of pumpkins
+				for(var i=0;i<2;i++,k1+=30)
     				{
     					var tY =  10 * Math.sin(targetY[i]);
 
-    					if(target1[i])
+    					if(fruit[p].target[i])
     						{
-    						ctx.drawImage(pumpkin_collect_image, changebg.xBack +620 + k1,fruit1.arr+tY ,25 ,25);
-    							
-    							if((changebg.xBack+620+k1-broomht.shipX)<70 && (changebg.xBack+620+k1-broomht.shipX)>-20)//subtract x axis of witch to compare
+    						ctx.drawImage(pumpkin_collect_image, changebg.xBack +620+p*100+k1,fruit[p].arr+tY ,25 ,25);
+    							if((changebg.xBack+620+p*100+k1-broomht.shipX)<70 && (changebg.xBack+620+p*100+k1-broomht.shipX)>-20)
     							{
-    								if((broomht.shipY-fruit1.arr)<50 && (broomht.shipY-fruit1.arr)>-100)
+    								if((broomht.shipY-fruit[p].arr)<50 && (broomht.shipY-fruit[p].arr)>-100)
     								{
-    									target1[i]=0;
+    									fruit[p].target[i]=0;
     									if(sc.score<100)
 											sc.score+=1;
     								}
     							}
     						}
-    					
-    					if(target2[i])
-    						{
-    						ctx.drawImage(pumpkin_collect_image, changebg.xBack +800 + k2,fruit2.arr+tY ,25 ,25);
-    						
-    						
-    						if((changebg.xBack+800+k2-broomht.shipX)<70 && (changebg.xBack+800+k2-broomht.shipX)>-20)//subtract x axis of witch to compare
-    							{
-    								if((broomht.shipY-fruit2.arr)<50 && (broomht.shipY-fruit2.arr)>-100)
-    								{
-    									target2[i]=0;
-										if(sc.score<100)
-											sc.score+=1;
-    								}
-    							}
-    						}
-    					
-    					k1+=30;
-    					k2+=30;
-    				}
-    		}
-    
+					}
+			}
+
 function drawBullet() {
     	for(j = 0; j < pumpkin_bullets.length ; j++ ) 
     	  if (pumpkin_bullets[j].px)
@@ -659,11 +645,12 @@ function checkstatus(){
 		if(l-chkstat>1000 && chkstat!=0 && sc.score<=0)
 		{
 			finalscore.endtime=finalscore.score;
-				swoop();						//for swooping down after losing
+				//swoop();						//for swooping down after losing
 				//lose();
 		}	
 	}
 function swoop(){      
+			var i=0;
 			while(i<10000)
 			if(i%10==0)
 			{	
@@ -700,8 +687,12 @@ function resetTargets()  // make changes
 			if(changebat.xBack<-1200)
 				{ 
 					changebat.xBack += 1200; 		// create a for loop for bats here 
-				  	for (var bb = 0 ; bb<4 ; bb++)
-				  		{big_bat[bb].exist = 1;
+				  	for (var bb = 0 ; bb<5 ; bb++)
+				  		{				 
+						if(Math.random() < 0.2)
+							big_bat[bb].exist = 0;
+						 else 
+							big_bat[bb].exist = 1;
 				  	     big_bat[bb].ht = Math.random()*250+bb*50;
 				  	     big_bat[bb].broomcol = 1;
 				  		}	
@@ -710,7 +701,11 @@ function resetTargets()  // make changes
 			if (changebg.xBack <= -1 * 1200)
             	{
 					changebg.xBack += 1200;
-					
+					for (var bb = 0 ; bb<4 ; bb++)
+				  	{	
+					fruit[bb].target = [1,1];
+					fruit[bb].arr=Math.random()*350+50;
+					}
 					ghostspawn.gy=350;
 					ghostspawn.collide=0;
 					p=0;
