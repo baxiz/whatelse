@@ -32,7 +32,8 @@ border-radius:10px;
 	<div id="bar"></div>
 	</div>
 </div>
-    
+		<img id="broomimage"  src="sp.png" style="display:none;"/>
+
 		<img id="bat" style="display:none" src="Bat1.png" />
 		<img id="smallbat1" style="display:none" />
 		<img id="smallbat2" style="display:none" />
@@ -87,7 +88,7 @@ window.onload=function(){
     }
 
     var collected= function(){
-    		this.score = 10;
+    		this.score = 30;
     }
 	var points= function(){
 		this.startime;
@@ -103,13 +104,11 @@ window.onload=function(){
     }
     
     var ghost = function (){
-    	
     	this.gx = 800;
     	this.gy = 350;
     	this.v=1;	
 		this.collide=0;
 	}
-    
     
     var batht=function() {					//for height of bats appearing			
 		this.ht = Math.random()*200+50; 
@@ -118,9 +117,8 @@ window.onload=function(){
         this.broomcol = 1;
 	}
  
-    
     var big_bat = [];						//array of objects for big bats
-    for(var bb = 0 ; bb<3 ; bb++)
+    for(var bb = 0 ; bb<4 ; bb++)
     	{big_bat[bb] = new batht;
     	 big_bat[bb].pos_space = 750 + (bb*150);
     	}
@@ -150,7 +148,7 @@ window.onload=function(){
 	var finalscore=new points();
 	
     var target1 = [1,1,1,1],target2 = [1,1,1,1] ,targetX = [], targetY = [], targetSpeed = 1.5, phase = 0.1, targets=4;
-	var l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0, chkstat=0, prob=1;			//l,m,n -->counter variables
+	var l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0, chkstat=0, prob=1, size=0;			//l,m,n -->counter variables
 	var bat_collide1=[],bat_collide2=[];
 	
 	for(var t=0;t<20;t++)
@@ -169,8 +167,8 @@ window.onload=function(){
     var keysDown = {};
      
     // broom 
-    var broomReady = false;
-    var broomimage = new Image();
+    //var broomReady = false;
+    //var broomimage = new Image();
 
     //pumpkin bullet 
     var pumpkin_bullet_Ready = false;
@@ -220,7 +218,6 @@ function init() {
            newTargets();
 		   loadimages();
            animate();
-           //addEventListener("mouseup",newBullet, false);
            addEventListener("keydown",newBullet, false);
            addEventListener('keydown',onKeyDown,false);
            addEventListener('keyup',onKeyUp,false);
@@ -236,11 +233,11 @@ function newTargets() {
 		   
 function loadimages(){
 	
-	    broomimage.onload = function () {
+	    /*broomimage.onload = function () {
 	    broomReady = true;
 	    };
-		broomimage.src = "witch.png";
-		
+		broomimage.src = "sp.png";
+		*/
 		lightImage.onload = function () {
        	lightReady = true;
 		};
@@ -265,7 +262,7 @@ function loadimages(){
         };      
 		pumpkin_collect_image.src = "pumpkin_hit.png";
 		
-		ghostimage.onload = function () {
+		ghostimage.onload= function () {
 		ghostready = true;
         };      
 		ghostimage.src = "ghost.png";
@@ -317,7 +314,7 @@ function animate() {
 		hitbats();
 		destroyBullet();
 		
-		if(Math.random()*1000<1 && y1!=1 && y2!=1)	
+		if(Math.random()*1000<2 && y1!=1 && y2!=1)	
 		{
 			n=Math.random()*100+50;
 			colonyofbats();
@@ -372,7 +369,6 @@ function model() {
 			} 
         } 
           
-          
         for (i = 0; i < targets; i++) {
                 targetX[i] -= targetSpeed;
                 targetY[i] += phase;
@@ -394,7 +390,7 @@ function drawBack() {
 			
 function lightning()
 	{
-				if(Math.random()*1000<10 && bingo==1 && y1!=0 && y2!=0)
+				if(Math.random()*1000 < (changebg.xIncr*2) && bingo==1 && y1!=0 && y2!=0)
 				{
 					bingo=Math.random()*300+10;
 				}
@@ -434,12 +430,7 @@ function drawbroom() {
 	 // load sprite  
     var t  = time/1000;
     var speed = 1500;
-    var slow = 1.01;
-   /* broomimage.onload = function () {
-    	broomReady = true;
-    };
-    	broomimage.src = "witch.png";*/
-    
+    var slow = 1.01;    
     	  
     	 // for broomht.direction movement 
     	   if (39 in keysDown || broomht.right)
@@ -528,15 +519,22 @@ function drawbroom() {
                    else
                 	  broomht.shipY += broomht.accy; slow = 1.01; broomht.accy = broomht.accy/slow;
                 	   }
-        
-		ctx.drawImage(broomimage, broomht.shipX, broomht.shipY, 75, 75);
+		if(size==14000)
+			size=0;
+		if(l%10==0)
+		{
+			ctx.drawImage(broomimage, size, 0 ,1400 ,1000, broomht.shipX, broomht.shipY, 75, 75); 
+			size+=1400;
+		}
+		else
+			ctx.drawImage(broomimage, size, 0 ,1400 ,1000, broomht.shipX, broomht.shipY, 75, 75); 
 		}
 
 
 function hitbats()
 {   var index;
 
-	for(var bb = 0; bb<3 ; bb++ )
+	for(var bb = 0; bb<4 ; bb++ )
 	for(j = 0; j < pumpkin_bullets.length ; j++ ) 
 	{
 	  index = pumpkin_bullets.indexOf(pumpkin_bullets[j]);
@@ -554,7 +552,6 @@ function hitbats()
 						k--;
 					}
 				}
-	   
 	}
 	}	
 }
@@ -566,7 +563,7 @@ function drawBats(){
 			};
        	changebat.xBack -= changebg.xIncr+3;
 
-       	for (var bb = 0 ; bb<3 ; bb++)
+       	for (var bb = 0 ; bb<4 ; bb++)
        	{
 		  if(big_bat[bb].exist)
 		{  ctx.drawImage(bat, changebat.xBack +big_bat[bb].pos_space,big_bat[bb].ht ,40 ,40);
@@ -575,7 +572,7 @@ function drawBats(){
 					if((broomht.shipY-big_bat[bb].ht)<40 && (broomht.shipY-big_bat[bb].ht)>-60)
 						{ 
 							big_bat[bb].broomcol = 0;
-							sc.score-=5;
+							sc.score-=10;
 						}
 					}
         }  
@@ -641,7 +638,6 @@ function drawScore() {
 			if(l%100==5)sc.score-=2;
 			
 			if(sc.score>100) sc.score=100;
-			else if(sc.score<0) sc.score=0;
 			
 			if(finalscore.score>prob*300)	//increases speed of the game
 			{
@@ -653,18 +649,29 @@ function drawScore() {
 		}
 
 function checkstatus(){		
+		var i=0;
 		finalscore.score = ((((new Date()).getTime()-finalscore.startime)-(((new Date()).getTime()-finalscore.startime)%100))/100);
 		ctx.fillText(finalscore.score,700,480);
 		
 		if(sc.score>0)chkstat=0;
-		else if(chkstat==0 && sc.score==0)
+		else if(chkstat==0 && sc.score<=0)
 			chkstat=l;
-		if(l-chkstat>250 && chkstat!=0 && sc.score==0)
+		if(l-chkstat>1000 && chkstat!=0 && sc.score<=0)
 		{
 			finalscore.endtime=finalscore.score;
-			lose();
+				swoop();						//for swooping down after losing
+				//lose();
 		}	
 	}
+function swoop(){      
+			while(i<10000)
+			if(i%10==0)
+			{	
+				broomht.shipX-=5;
+				broomht.shipY-=2;
+				ctx.drawImage(broomimage, size, 0 ,1400 ,1000, broomht.shipX, broomht.shipY, 75, 75); 
+			}
+		}
 /*	
 function lose{			//tempalate after user loses
 
@@ -672,7 +679,7 @@ function lose{			//tempalate after user loses
 */	
 function resetTargets()  // make changes   
 	{
-	// if background scrolled off screen, reset 
+			// if background scrolled off screen, reset 
 			if (changesmallbat1.xBack <= -1 * 1200)
  				{
 					changesmallbat1.xBack += 1200;
@@ -692,8 +699,8 @@ function resetTargets()  // make changes
 				
 			if(changebat.xBack<-1200)
 				{ 
-					changebat.xBack += 1200; // create a for loop for bats here 
-				  	for (var bb = 0 ; bb<3 ; bb++)
+					changebat.xBack += 1200; 		// create a for loop for bats here 
+				  	for (var bb = 0 ; bb<4 ; bb++)
 				  		{big_bat[bb].exist = 1;
 				  	     big_bat[bb].ht = Math.random()*250+bb*50;
 				  	     big_bat[bb].broomcol = 1;
@@ -754,7 +761,7 @@ function resetTargets()  // make changes
 				document.getElementById("smallbat2").src=document.getElementById("bat1").src;
 				document.getElementById("smallbat3").src=document.getElementById("bat2").src;
 			}
-
+			
 			l++; m++;
 	}
 
