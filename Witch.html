@@ -214,14 +214,15 @@ function onKeyUp(e) {
     	}
 
 function init() {
-    	
+			
 		   bat = document.getElementById("bat");
     	   back = document.getElementById("back");
            can = document.getElementById("can");
            ctx = can.getContext("2d");
            ctx.font = "18pt Creepster";
 		   ctx.fillStyle = '#c24100';
-           newTargets();
+           intro();
+		   newTargets();
 		   loadimages();
            animate();
            addEventListener("keydown",newBullet, false);
@@ -231,6 +232,18 @@ function init() {
            
 		   finalscore.startime= (new Date()).getTime();
 		   }
+		   
+function intro(){
+			var u=0;
+			function loop(){
+					ctx.drawImage(back,0,0,800,500);
+					for(var i=0;i<1000000000;i++);
+					}
+			for(u=0;u<5;u++)
+			{
+				loop();
+			}
+		}
      
 function newTargets() {
                 for (i = 0; i < targets; i++)
@@ -643,28 +656,23 @@ function drawScore() {
 
 function checkstatus(){		
 		var i=0;
-		finalscore.score = ((((new Date()).getTime()-finalscore.startime)-(((new Date()).getTime()-finalscore.startime)%100))/100);
-		ctx.fillText(finalscore.score,700,480);
 		
 		if(sc.score>0)chkstat=0;
 		else if(chkstat==0 && sc.score<=0)
 			chkstat=l;
 		if(l-chkstat>1000 && chkstat!=0 && sc.score<=0)
 		{
-			finalscore.endtime=finalscore.score;
+			finalscore.endtime= ((((new Date()).getTime()-finalscore.startime)-(((new Date()).getTime()-finalscore.startime)%100))/100);
+				ctx.fillText("GAME OVER ",400,250);
 				//swoop();						//for swooping down after losing
 				//lose();
-		}	
+		}
+		else
+			finalscore.score = ((((new Date()).getTime()-finalscore.startime)-(((new Date()).getTime()-finalscore.startime)%100))/100);
+			ctx.fillText(finalscore.score,700,480);
 	}
 function swoop(){      
-			var i=0;
-			while(i<10000)
-			if(i%10==0)
-			{	
-				broomht.shipX-=5;
-				broomht.shipY-=2;
-				ctx.drawImage(broomimage, size, 0 ,1400 ,1000, broomht.shipX, broomht.shipY, 75, 75); 
-			}
+
 		}
 /*	
 function lose{			//tempalate after user loses
