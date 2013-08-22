@@ -7,7 +7,7 @@
 <style>
 #barupdate{
 float:right;
-background-color:#000000;
+background-color:#202020;
 width:40px;
 height:500px;
 border-radius:10px;
@@ -630,8 +630,15 @@ function drawScore() {
 				prob++;	
 				changebg.xIncr++;
 			}
-			document.getElementById("bar").style.height=(sc.score*5)+"px";
-			document.getElementById("bar").style.marginTop=(500-sc.score*5)+"px";
+			document.getElementById("bar").style.height=(sc.score*4)+"px";
+			document.getElementById("bar").style.marginTop=(400-sc.score*4)+"px";
+			document.getElementById("bar").style.backgroundColor='#c24100';
+			if(sc.score < 0)
+				{
+				document.getElementById("bar").style.backgroundColor='#ff0000';
+				document.getElementById("bar").style.height=(-sc.score*1)+"px";
+				document.getElementById("bar").style.marginTop="400px";
+				}
 		}
 
 function checkstatus(){		
