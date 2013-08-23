@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Witch Run</title>
+    <link href="http://fonts.googleapis.com/css?family=Creepster" rel="stylesheet" type="text/css">	
+	<meta name="viewport" content="width=600" />
+<style>
+#scoreupdate{
+width:200px;
+background-color:#000000;
+color:#c24100;
+font-size:25px;
+font-family:"Creepster";
+padding-top:15px;
+text-align:center;
+}
+
+#barupdate{
+float:right;
+width:500px;
+background-color:#000000;
+color:#c24100;
+font-size:25px;
+}
+
+.center{
+width:800px;
+margin:0 auto;
+margin-top:5px;
+background-color:#000000;
+padding-bottom:20px;
+}
+
+#bar{
+margin:-28px 20px 0px 0px;
+float:right;
+width:0px;
+height:30px;
+background-color:#c24100;
+transition:width 3s;
+border-radius:10px;
+}
+</style>
+
+<script type="text/javascript">
+    
+    window.requestAnimFrame = (function() {
+    	return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+    	function(callback) {
+    		window.setTimeout(callback, 1000 / 60);
+    	};
+    })();
+
+    var can, ctx, back; //for canvas and drawimage 
+
+    var batht=function() {					//for height of bats appearing			
+    		this.ht=Math.random()*200+50;
+    	}
+
+    var broom=function() {					//has coords of broom 
+    		this.shipX=10;
+    		this.shipY=140;
+    		this.right=false;
+    		this.left = false;
+    		this.down = false;
+    		this.up = false;
+    		this.accx = 2;
+    		this.accy = 2;
+    		this.direction;
+    		this.isp;
+    }
+
+    var background= function() {			//var for scrolling background 
+    		this.xBack=0;
+    		this.xIncr=4;
+    }
+
+    var pumpkin= function(){
+    		this.px;
+    		this.py;
+    		this.v;
+    		this.theta;
+    }
+
+    var points = function(){				//for height of pumpkins
+    		this.arr=Math.random()*350+50;
+    }
+
+    var collected= function(){				// storing points
+    		this.score=10;
+    }
+
+    var pumpkinhit = function (){
+    	this.px;
+    	this.py;
+    	this.v;
+    	this.theta;
+    	}
+    	
+    var pumpkin = new pumpkinhit(); 
+    var broomht = new broom();
+	
+    var changebg = new background();
+	var changebat = new background();
+    var sc = new collected();
+    
+	var height = new batht();
+	var height1 = new batht();
+	var height2 = new batht();	
+	
+	var fruit1 = new points();
+    var fruit2 = new points();
+
+    var target1 = [1,1,1,1],target2 = [1,1,1,1] ,targetX = [], targetY = [], targetSpeed = 1.5, phase = 0.1, targets=4;
+	
+	var collide = [1,1,1],l=0,m=0,bingo=1;		//l,m -->counter variables			
+												//collide, target1, target2 --> to check if collision with bats and pumpkins respectively
+    var d = new Date();
+    var dnw = new Date();
+    var startTime,time;
+    var deg = 45;
+    var te = 0.1;
+    var i = 0; 
+     
+    // broom 
+    var broomReady = false;
+    var broomimage = new Image();
+
+    //pumpkin bullet 
+    var pumpkin_bullet_Ready = false;
+    var pumpkin_bullet_image = new Image();
+
+    //pumpkin collect 
+    var pumpkin_collect_Ready = false;
+    var pumpkin_collect_image = new Image();
+	
+/*	var bat =false;
+	var bat = new Image();
+*/
+
+	var lightReady = false;
+	var lightImage =new Image();
+
+	var thunderReady1 = false;
+	var thunderImage1 = new Image();
+	var thunderReady2 = false;
+	var thunderImage2 = new Image();
+	var thunderReady3 = false;
+	var thunderImage3 = new Image();
+	
+    // to move broom 
+    function onKeyDown(e) {
+    	  broomht.isp = 0.01;
+    	  if (e.keyCode == 39){broomht.right = true ; broomht.direction = 'broomht.right'; broomht.accx = 2; broomht.isp = broomht.isp + 0.001;}
+    	  if (e.keyCode == 37){broomht.left = true; broomht.direction = 'broomht.left'; broomht.accx = 2;    broomht.isp = broomht.isp + 0.001;}
+    	  if (e.keyCode == 40){broomht.up = true; broomht.direction = 'broomht.up'; broomht.accy = 2;        broomht.isp = broomht.isp + 0.001;}
+      	  if (e.keyCode == 38){broomht.down = true; broomht.direction = 'broomht.down'; broomht.accy = 2;    broomht.isp = broomht.isp + 0.001;}
+    	}
+
+    function onKeyUp(e) {
+    	  if (e.keyCode == 39) broomht.right = false;  
+    	  if (e.keyCode == 37) broomht.left = false;
+    	  if (e.keyCode == 40) broomht.up = false;
+    	  if (e.keyCode == 38) broomht.down = false;
+    	}
+
+    /*
+	// move ship in response to mouse
+    function move(e)
+    {
+        if (!e)
+            e = event;
+        broomht.shipY = e.pageY;
+        return false;
+    }
+
+    // move ship in response to touch
+    function tMove(e)
+    {
+        if (!e)
+            e = event;
+        broomht.shipY = e.touches[0].pageY;
+        return false;
+    }
+	*/
+	
+    function init() {
+    	
+		   bat = document.getElementById("bat");
+    	   back = document.getElementById("back");
+           can = document.getElementById("can");
+           ctx = can.getContext("2d");
+           ctx.font = "14pt Helvetica";
+           newTargets();
+           animate();
+           //can.addEventListener("mousemove",move, false);
+           //can.addEventListener("touchmove",tMove, false);
+           can.addEventListener("mouseup",newBullet, false);
+           addEventListener('keydown',onKeyDown,false);
+           addEventListener('keyup',onKeyUp,false);
+           time = d.getTime();
+           }
+     
+    function newTargets() {
+                for (i = 0; i < targets; i++)
+                    targetY[i] = i * Math.PI / 2;
+           }
+     
+    function newBullet(e) {
+    	
+    	//pumpkin_array[0].px = 35;
+    	//pumpkin_array[0].py = broomht.shipY + 10; 
+    	
+		sc.score-=1;
+    	pumpkin.px = broomht.shipX + 35;
+        pumpkin.py = broomht.shipY + 10;
+        te = 0;
+
+		//bullet.push(pumpkin.px); 
+     }
+     
+    function animate() {
+    	model();
+        drawBack();
+		drawbroom();
+		drawPumpkins();
+	    drawBats();
+		drawBullet();
+		//drawTarget();
+        drawScore();
+				
+		// if background scrolled off screen, reset
+			if(changebat.xBack<-1200)
+				{
+					changebat.xBack += 1200;
+					collide=[1,1,1];
+					height.ht=Math.random()*200;
+					height1.ht=Math.random()*250;
+					height2.ht=Math.random()*300;
+				}
+			
+			if (changebg.xBack <= -1 * 1200)
+            	{
+					changebg.xBack += 1200;
+					
+					fruit1.arr=Math.random()*300+50;
+					fruit2.arr=Math.random()*300+50;
+					target1=[1,1,1,1];
+					target2=[1,1,1,1];
+				}
+				
+			
+			if(l%15==5)
+			document.getElementById("bat").src=document.getElementById("bat1").src;
+			if(l%15==10)
+			document.getElementById("bat").src=document.getElementById("bat2").src;
+			if(l%15==14)
+			document.getElementById("bat").src=document.getElementById("bat3").src;
+	
+			l++; m++;
+			
+        requestAnimFrame(function() {
+            startTime = (new Date()).getTime();
+            animate();
+			});
+          time = (new Date()).getTime() - startTime;
+   
+    	}
+     
+    function model() {
+        // if there is a pumpkin, advance it 
+        if (pumpkin.px)
+        { 
+          var speed = 3500;
+          var gravity = 250;
+          var t = time/1000;
+          
+            pumpkin.px = pumpkin.px + speed*t;
+            pumpkin.py = pumpkin.py + (0.5*gravity*te*te);
+            te = te + 0.004;
+           //   pumpkin.py = startY - ( v0y * t - (1/2 * g * Math.pow(t,2)) ); 
+  
+         }
+        // if the pumpkin goes off the right edge, zero it 
+        if (pumpkin.px > can.width)
+             pumpkin.px = 0;
+        if (pumpkin.py > can.height)
+             te = 0;
+    
+        
+        for (i = 0; i < targets; i++) {
+                targetX[i] -= targetSpeed;
+                targetY[i] += phase;
+        }
+      
+        
+        // if last target off left edge of screen, 
+        // generate new set 
+        if (targetX[targets - 1] < 0)
+            newTargets();  
+    }
+
+     
+    function drawBack() {
+					// pan background                
+                    changebg.xBack -= changebg.xIncr;
+                    ctx.drawImage(back, changebg.xBack, 0 ,1200, 500);			//1200--> image width
+                    // draw new copy at broomht.right edge of old copy
+                    ctx.drawImage(back, changebg.xBack +1200 , 0 ,1200 , 500);
+				
+			
+			lightImage.onload = function () {
+        	lightReady = true;
+				};
+        	lightImage.src = "backlight.png";
+				
+				if(Math.random()*1000<500 && bingo==1)
+				{
+					bingo=Math.random()*300+10;
+				}
+				if(bingo!=1)
+				{	
+					 thunderImage1.onload = function () {
+						thunderReady1 = true;
+						};
+					thunderImage1.src = "Clouds.png";
+					
+					thunderImage2.onload = function () {
+						thunderReady2 = true;
+						};
+					thunderImage2.src = "Clouds2.png";
+					
+					thunderImage3.onload = function () {
+						thunderReady3 = true;
+						};
+					thunderImage3.src = "Clouds3.png";
+					
+					if(m%1000>=300 && m%1000<320)
+					ctx.drawImage(thunderImage1,bingo, 0 ,250, 320);
+					else if(m%1000>=320 && m%1000<400)
+					ctx.drawImage(thunderImage2,bingo, 0 ,250, 320);
+					else if(m%1000>400 && m%1000<405)					//when lightning strikes; check for broom under it
+					{
+						ctx.drawImage(thunderImage3,bingo, 0 ,250, 320);
+					
+					if((bingo-broomht.shipX)<30 && (bingo-broomht.shipX)>-180 && bingo!=1)
+    				{
+    					if(broomht.shipY<250)
+								{
+									bingo=1;
+									alert();
+									sc.score-=30;
+								}
+					}
+					}
+					else if(m%1000>410 && m%1000<500)
+					ctx.drawImage(thunderImage2,bingo, 0 ,250, 320);
+					else if(m%1000>500 && m%1000<520)
+					{
+						ctx.drawImage(thunderImage1,bingo, 0 ,200, 320);
+						bingo=1;
+					}
+				}
+				if(Math.random()*200<3)
+				ctx.drawImage(lightImage, Math.random()*800, 0 ,50, 200);
+			}
+		    		
+    function drawbroom() {
+    	 // load sprite  
+        var t  = time/1000;
+        var speed = 3500;
+        var slow = 1.03-broomht.isp;
+        broomimage.onload = function () {
+        	broomReady = true;
+        };
+        	broomimage.src = "witch.png";
+        
+        	  
+        	 // for broomht.direction movement 
+        	   if (broomht.right) broomht.shipX += speed*t;
+            else 
+               if (broomht.left) broomht.shipX -= speed*t;
+            else
+        	   if (broomht.up) broomht.shipY += speed*t;
+            else 
+               if (broomht.down) broomht.shipY -= speed*t;
+        	   
+        	   // for inertia 
+        	      if (!broomht.right && broomht.direction == 'broomht.right') {broomht.shipX += broomht.accx; slow = 1.05-broomht.isp; broomht.accx = broomht.accx/slow;}
+               else 
+                  if (!broomht.left && broomht.direction == 'broomht.left') {broomht.shipX -= broomht.accx; slow = 1.05-broomht.isp; broomht.accx = broomht.accx/slow;}
+               else
+           	      if (!broomht.up && broomht.direction == 'broomht.up') {broomht.shipY += broomht.accy; slow = 1.05-broomht.isp; broomht.accy = broomht.accy/slow;}
+               else 
+                  if (!broomht.down && broomht.direction == 'broomht.down') {broomht.shipY -= broomht.accy; slow = 1.05-broomht.isp; broomht.accy = broomht.accy/slow;}
+
+        ctx.drawImage(broomimage, broomht.shipX, broomht.shipY, 75, 75);
+
+    		}
+    	
+    function drawBats(){       	
+		bat.onload = function () {
+        	batReady = true;
+			};
+       	changebat.xBack -= 7;
+				
+				if(collide[0])
+				{
+					ctx.drawImage(bat, changebat.xBack +750,height.ht ,45 , 45);
+					if((changebat.xBack+750-broomht.shipX)<60 && (changebat.xBack+750-broomht.shipX)>-20)//subtract x axis of witch to compare
+    						{
+    						if((broomht.shipY-height.ht)<40 && (broomht.shipY-height.ht)>-60)
+    							{
+    								collide[0]=0;
+									sc.score-=5;
+    							}
+    						}
+				}
+				if(collide[1])
+				{
+					ctx.drawImage(bat, changebat.xBack +900,height1.ht ,40 , 40);
+				 	if((changebat.xBack+900-broomht.shipX)<60 && (changebat.xBack+900-broomht.shipX)>-20)//subtract x axis of witch to compare
+    				{
+    					if((broomht.shipY-height1.ht)<40 && (broomht.shipY-height1.ht)>-60)
+    					{
+    						collide[1]=0;
+							sc.score-=5;
+    					}
+    				}
+				}
+				if(collide[2])
+				{
+					ctx.drawImage(bat, changebat.xBack +1050,height2.ht ,40 , 40);
+				 	if((changebat.xBack+1050-broomht.shipX)<60 && (changebat.xBack+1050-broomht.shipX)>-20)//subtract x axis of witch to compare
+    				{
+    					if((broomht.shipY-height2.ht)<40 && (broomht.shipY-height2.ht)>-60)
+    					{
+    						collide[2]=0;
+							sc.score-=5;
+    					}
+    				}
+				}
+    		}
+    		
+    function drawPumpkins() {
+    				
+    	 pumpkin_collect_image.onload = function () {
+         	pumpkin_collect_Ready = true;
+             };
+             
+         	pumpkin_collect_image.src = "pumpkin_hit.png";
+         	
+    				var k1=fruit1.arr,k2=fruit2.arr;
+    				for(var i=0;i<5;i++)					// 4 targets in total
+    				{
+    					var tY =  10 * Math.sin(targetY[i]);
+
+    					if(target1[i])
+    						{
+    						ctx.drawImage(pumpkin_collect_image, changebg.xBack +620 + k1,fruit1.arr+tY ,25 ,25);
+    							
+    							if((changebg.xBack+620+k1-broomht.shipX)<70 && (changebg.xBack+620+k1-broomht.shipX)>-20)//subtract x axis of witch to compare
+    							{
+    								if((broomht.shipY-fruit1.arr)<50 && (broomht.shipY-fruit1.arr)>-100)
+    								{
+    									target1[i]=0;
+    									if(sc.score<100)
+											sc.score+=1;
+    								}
+    							}
+    						}
+    					
+    					if(target2[i])
+    						{
+    						ctx.drawImage(pumpkin_collect_image, changebg.xBack +800 + k2,fruit2.arr+tY ,25 ,25);
+    						
+    						
+    						if((changebg.xBack+800+k2-broomht.shipX)<70 && (changebg.xBack+800+k2-broomht.shipX)>-20)//subtract x axis of witch to compare
+    							{
+    								if((broomht.shipY-fruit2.arr)<50 && (broomht.shipY-fruit2.arr)>-100)
+    								{
+    									target2[i]=0;
+										if(sc.score<100)
+											sc.score+=1;
+    								}
+    							}
+    						}
+    					
+    					k1+=30;
+    					k2+=30;
+    				}
+    		}
+    		  
+    function drawBullet() {
+        if (pumpkin.px)
+          { 	//ctx.fillRect(pumpkin.px, pumpkin.py, 2, 1);
+        
+            pumpkin_bullet_image.onload = function () {
+        	pumpkin_bullet_Ready = true;
+            };
+            
+        	pumpkin_bullet_image.src = "pumpkin_hit.png";
+        	
+        ctx.drawImage(pumpkin_bullet_image, pumpkin.px, pumpkin.py, 25, 25);
+		 }
+    }
+   
+	function drawScore() {
+				/*if(sc.score<0)
+				{
+					alert("GAME OVER");
+				}*/
+    			document.getElementById("scoreupdate").innerHTML="PUMPKINS :"+" "+sc.score;
+                document.getElementById("bar").style.width=(sc.score*5)+"px";
+    }
+     
+</script>
+</head>
+
+<body onload="init()">
+	<div style="width:800px;margin:0 auto;">
+    <canvas id="can" height="500" width="800">
+    </canvas>
+	</div>
+	
+	<div class="center">
+	<div id="scoreupdate"></div>
+	<div id="barupdate">
+	<div id="bar"></div>
+	</div>
+	</div>
+    
+		<img id="bat" style="display:none" src="Bat1.png" />
+		
+		<img id="bat1" style="display:none" src="Bat1.png" />
+		<img id="bat2" style="display:none" src="Bat2.png" />
+		<img id="bat3" style="display:none" src="Bat3.png" />
+		
+		<!--<img id="light" style="display:none" />
+		<img id="cloud1" style="display:none" src="Clouds1.png" />
+		<img id="cloud2" style="display:none" src="Clouds2.png" />
+		<img id="cloud3" style="display:none" src="Clouds3.png" />
+		-->
+	<img id="back" style="display:none" src="BG4.png" />
+</body>
+</html>

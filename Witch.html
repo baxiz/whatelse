@@ -52,6 +52,15 @@ window.onload=function(){
     		window.setTimeout(callback, 1000 / 60);
     	};
     })();
+	
+	window.cancelRequestAnimFrame = ( function() {
+    return window.cancelAnimationFrame          ||
+        window.webkitCancelRequestAnimationFrame    ||
+        window.mozCancelRequestAnimationFrame       ||
+        window.oCancelRequestAnimationFrame     ||
+        window.msCancelRequestAnimationFrame        ||
+        clearTimeout
+	})();
 
     var can, ctx, back; 					//for canvas and drawimage 
 
@@ -133,7 +142,7 @@ window.onload=function(){
     for(var j = 0 ; j<3 ; j++)
     pumpkin_bullets[j] = new pumpkinhit(0,0,0.1,0); 
     
-   // var pumpkin = new pumpkinhit(); 
+	// var pumpkin = new pumpkinhit(); 
     var broomht = new broom();
 	var ghostspawn  =  new ghost();
     var changebg = new background();
@@ -154,7 +163,7 @@ window.onload=function(){
 	var finalscore=new points();
 	
     var target1 = [1,1,1,1],target2 = [1,1,1,1] ,targetX = [], targetY = [], targetSpeed = 1.5, phase = 0.1, targets=4;
-	var l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0, chkstat=0, prob=1, size=0;			//l,m,n -->counter variables
+	var l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0, chkstat=0, prob=1, size=0, request, y=0;			//l,m,n -->counter variables
 	var bat_collide1=[],bat_collide2=[];
 	
 	for(var t=0;t<20;t++)
@@ -207,11 +216,25 @@ function onKeyDown(e) {
     	}
 
 function onKeyUp(e) {
-    	  if (e.keyCode == 39 || e.keyCode == 68) broomht.right = false;  
-    	  if (e.keyCode == 37 || e.keyCode == 65) broomht.left = false;
-    	  if (e.keyCode == 38 || e.keyCode == 87) broomht.up = false;
-    	  if (e.keyCode == 40 || e.keyCode == 83) broomht.down = false;
-    	}
+		  if (e.keyCode == 39 || e.keyCode == 68) broomht.right = false;  
+    	  else if (e.keyCode == 37 || e.keyCode == 65) broomht.left = false;
+    	  else if (e.keyCode == 38 || e.keyCode == 87) broomht.up = false;
+    	  else if (e.keyCode == 40 || e.keyCode == 83) broomht.down = false;
+		  else {
+						if(e.keyCode == 13 && y==0)
+						{
+						y=1;
+						setTimeout(function(){
+							cancelRequestAnimFrame(request);                
+								}, 100);
+							}
+						else if(y==1)
+						{
+							y=0;
+							animate();
+						}
+			}
+		}
 
 function init() {
 			
@@ -233,18 +256,6 @@ function init() {
 		   finalscore.startime= (new Date()).getTime();
 		   }
 		   
-function intro(){
-			var u=0;
-			function loop(){
-					ctx.drawImage(back,0,0,800,500);
-					for(var i=0;i<1000000000;i++);
-					}
-			for(u=0;u<5;u++)
-			{
-				loop();
-			}
-		}
-     
 function newTargets() {
                 for (i = 0; i < targets; i++)
                     targetY[i] = i * Math.PI / 2;
@@ -353,11 +364,11 @@ function animate() {
 		drawScore();
 		checkstatus();
 			
-        requestAnimFrame(function() {
+        request = requestAnimFrame(function() {
             startTime = (new Date()).getTime();
             animate();
 			});
-			
+		
           time = (new Date()).getTime() - startTime;
 		}
      
