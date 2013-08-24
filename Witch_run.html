@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Witch Run</title>
-	<link href="http://fonts.googleapis.com/css?family=Creepster" rel="stylesheet" type="text/css">
+<!--	<link href="http://fonts.googleapis.com/css?family=Creepster" rel="stylesheet" type="text/css">-->
 	<meta name="viewport" content="width=600" />
 <style>
 #barupdate{
@@ -24,7 +24,7 @@ border-radius:10px;
 </style>
 </head>
 
-<body onload="init()">
+<body onload="">
 <div style="width:845px;margin:0 auto;">
     <canvas id="can" height="500" width="800">
     </canvas>
@@ -36,24 +36,24 @@ border-radius:10px;
         <audio id="pumpkin_sound" src="sound/pumpkin.wav" type="audio/wav" preload="auto"></audio>
         <audio id="bgm_sound" src="sound/witch.ogg" type="audio/ogg" preload="auto"></audio>
         <audio id="hitbat_sound" src="sound/hitbat.wav" type="audio/wav" preload="auto"></audio>
-        <audio id="bullet_sound" src="sound/bullet.wav" type="audio/wav" preload="auto"></audio>
+        <audio id="bullet_sound" src="sound/blast.ogg" type="audio/ogg" preload="auto"></audio>
         <audio id="ouch_sound" src="sound/ouch.wav" type="audio/wav" preload="auto"></audio>
         
 	<div id="barupdate">
 	<div id="bar"></div>
 	</div>
 </div>
-
 		<img id="bat" style="display:none" src="Bat1.png" />
 		<img id="smallbat1" style="display:none" />
 		<img id="smallbat2" style="display:none" />
 		<img id="smallbat3" style="display:none" />
-		
+
 		<img id="bat1" style="display:none" src="Bat1.png" />
 		<img id="bat2" style="display:none" src="Bat2.png" />
 		<img id="bat3" style="display:none" src="Bat3.png" />
-		
+
 		<img id="back" style="display:none" src="BG4.png" />
+		<img id="clouds" style="display:none" src="clouds.png" />
 </body>
 
 <script type="text/javascript">
@@ -64,12 +64,13 @@ window.onload=function(){
     		window.setTimeout(callback, 1000 / 60);
     	};
     })();
-	
-	window.cancelRequestAnimFrame = ( function() {
-    return window.cancelAnimationFrame          ||
+
+	window.cancelRequestAnimFrame = ( function() {model
+
+    return window.cancelAnimationFrame              ||
         window.webkitCancelRequestAnimationFrame    ||
         window.mozCancelRequestAnimationFrame       ||
-        window.oCancelRequestAnimationFrame     ||
+        window.oCancelRequestAnimationFrame         ||
         window.msCancelRequestAnimationFrame        ||
         clearTimeout
 } )();
@@ -79,6 +80,7 @@ window.onload=function(){
     var audio = function(id){
       	 this.id  = id;
       	 var sound = document.getElementById(id);
+      	 var vol;
       	 var check = true;
            this.load = function(){
                   sound.load();	  
@@ -87,17 +89,16 @@ window.onload=function(){
            this.loop = function() {
           	
           	 if(check)
-          	 {//sound.currentTime = 0;
+          	 {  // sound.currentTime = 0;
                 sound.play();
                 check = false;
           	 }
           	 
-               if(sound.ended)
+               if(sound.ended || request)
               	 check = true;
            }
-           this.volume = function() {}        
+           this.volume = function(vol) {sound.volume = vol;}        
            
-           //lAudioNote.volume = 0.7;
          }    
       
       
@@ -139,6 +140,9 @@ window.onload=function(){
     		this.direction;
     		this.isp;
     		this.driftsp = 0.75;
+    		this.upspeed = 7;
+    		this.downspeed = 3;
+    		this.normalspeed = 3.5;
     }
 
     var background= function() {			//var for scrolling background 
@@ -149,8 +153,7 @@ window.onload=function(){
     var pumpkin= function(){
     		this.px;
     		this.py;
-    		this.v;
-    		this.theta;
+    		this.v;	
     }
 
     var points = function(){				//for ht. of pumpkins to be collected
@@ -171,7 +174,8 @@ window.onload=function(){
     	this.px;
     	this.py;
     	this.v;
-    	this.theta;
+    	this.tlapse;
+    	this.exist;
     }
     
     var ghost = function (){
@@ -200,7 +204,7 @@ window.onload=function(){
 			big_bat[bb] = new batht;
 			big_bat[bb].pos_space = 750 + (bb*150);
 		}
-	
+
     var pumpkin_bullets = [];
     for(var j = 0 ; j<3 ; j++)
     pumpkin_bullets[j] = new pumpkinhit(0,0,0.1,0); 
@@ -211,7 +215,7 @@ window.onload=function(){
     var changebg = new background();
     var changebat = new background();
     var changeghost = new background();
-	
+
 	var changesmallbat1 = new background();
 	var changesmallbat2 = new background();
     var sc = new collected();
@@ -219,23 +223,23 @@ window.onload=function(){
 	var height = new batht();
 	var height1 = new batht();
 	var height2 = new batht();	
-	
+
 	var fruit1 = new points();
     var fruit2 = new points();
 
 	var finalscore=new points();
-	
+
     var target1 = [1,1,1,1],target2 = [1,1,1,1] ,targetX = [], targetY = [], targetSpeed = 1.5, phase = 0.1, targets=4;
 	var l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0, chkstat=0, prob=1, size=0, request, y=0, restart=0, introvalue=1;			//l,m,n -->counter variables
 	var bat_collide1=[],bat_collide2=[];
-	
+
 	for(var t=0;t<20;t++)
 	{
 		bat_collide1[t]=0;
 		if(i<15)
 			bat_collide2[t]=0;
 	}
-	
+
     var d = new Date();
     var dnw = new Date();
     var startTime,time;
@@ -265,10 +269,10 @@ window.onload=function(){
 	var thunderImage2 = new Image();
 	var thunderReady3 = false;
 	var thunderImage3 = new Image();
-	
+
 	var ghostready = false;
 	var ghostimage =new Image();
-	
+
     // to move broom 
 function onKeyDown(e) {
     	  broomht.isp = 0.01;
@@ -308,23 +312,30 @@ function onKeyUp(e) {
 		}
 
 function init() {
-	
-	
-	
+
+
+
 	target1 = [1,1,1,1],target2 = [1,1,1,1] ,targetX = [], targetY = [], targetSpeed = 1.5, phase = 0.1, targets=4,
     l=0, m=0, n=0,p=0 ,bingo=1, y1=0, y2=0, chkstat=0, prob=1, size=0, request, y=0,			//l,m,n -->counter variables
-	 bat_collide1=[],bat_collide2=[];
+	bat_collide1=[],bat_collide2=[];
 	sc.score=30;
 	changebg.xIncr=4;
-	restart=0;
-			
+
+	broomht.shipX = 10;
+	broomht.shipY = 140;
+
 		   bat = document.getElementById("bat");
     	   back = document.getElementById("back");
+           can = document.getElementById("can");
+           ctx = can.getContext("2d");
+           ctx.font = "18pt Creepster";
+		   ctx.fillStyle = '#c24100';
+           //intro();
 		   newTargets();
 		   loadimages();
 		   load_sounds();
            animate();
-           addEventListener("keydown",newBullet, false);
+           addEventListener("keyup",newBullet, false);
            addEventListener('keydown',onKeyDown,false);
            addEventListener('keyup',onKeyUp,false);
            time = d.getTime();
@@ -332,29 +343,41 @@ function init() {
 		   finalscore.startime= (new Date()).getTime();
 		   finalscore.endtime = 0;
 		   }
+
+function intro(){
+			var u=0;
+			function loop(){
+					ctx.drawImage(back,0,0,800,500);
+					for(var i=0;i<1000000000;i++);
+					}
+			for(u=0;u<5;u++)
+			{
+				loop();
+			}
+		}
      
 function newTargets() {
                 for (i = 0; i < targets; i++)
                     targetY[i] = i * Math.PI / 2;
            }
-		   
+
 function loadimages(){
-	
+
 	    broomimage.onload = function () {
 	    broomReady = true;
 	    };
 		broomimage.src = "sp.png";
-		
+
 		lightImage.onload = function () {
        	lightReady = true;
 		};
 		lightImage.src = "backlight.png";
-	
+
 		thunderImage1.onload = function () {
 		thunderReady1 = true;
 		};
 		thunderImage1.src = "Clouds.png";
-				
+
 		thunderImage2.onload = function () {
 		thunderReady2 = true;
 		};
@@ -363,12 +386,12 @@ function loadimages(){
 		thunderReady3 = true;
 		};
 		thunderImage3.src = "Clouds3.png";
-	
+
 		pumpkin_collect_image.onload = function () {
 		pumpkin_collect_Ready = true;
         };      
 		pumpkin_collect_image.src = "pumpkin_hit.png";
-		
+
 		ghostimage.onload= function () {
 		ghostready = true;
         };      
@@ -376,6 +399,10 @@ function loadimages(){
 	}
     
 function newBullet(e) {
+
+	//addEventListener('click',function (){while(e.keycode == 32) shoot++; alert(shoot);},false);
+	//can.onkeypress=function(e){while(e.keycode == 32) shoot++; alert(shoot);};
+
 	if (e.keyCode == 32)
 		{
     	pumpkin_bullets.push(new pumpkinhit(0,0,0.1,0));  	
@@ -385,8 +412,10 @@ function newBullet(e) {
     	pumpkin_bullets[k].py = broomht.shipY + 10;
         pumpkin_bullets[k].tlapse = 0;
         pumpkin_bullets[k].exist = 1;
+        pumpkin_bullets[k].v = 7;
         k++;
 		}
+
     }
 
 function destroyBullet()
@@ -420,7 +449,8 @@ function animate() {
 		bgm_sound.loop();
 		hitbats();
 		destroyBullet();
-		
+		bgm_sound.loop();
+		//ctx.drawImage(clouds, 0 , 0 ,1200 , 500);
 		if(Math.random()*1000<2 && y1!=1 && y2!=1)	
 		{
 			n=Math.random()*100+50;
@@ -430,22 +460,22 @@ function animate() {
 		}
 		if(y1==1||y2==1)
 			colonyofbats();
-			
+
 		if(Math.random()*5000<10 && changebg.xBack>-700)
 			ghosts();
-		
+
 		if(p==1)
 			ghosts();
-			
+
 		resetTargets();
 		drawScore();
 		checkstatus();
-			
+
         request = requestAnimFrame(function() {
             startTime = (new Date()).getTime();
             animate();
 			});
-		
+
           time = (new Date()).getTime() - startTime;
 		}
      
@@ -461,9 +491,9 @@ function model() {
           if (pumpkin_bullets[j].px)
           { 
         	  
-        	pumpkin_bullets[j].px =  pumpkin_bullets[j].px + speed;
-            pumpkin_bullets[j].py =  pumpkin_bullets[j].py + (0.5*gravity*Math.pow(pumpkin_bullets[j].tlapse,2));
-            pumpkin_bullets[j].tlapse = pumpkin_bullets[j].tlapse + 0.004;
+        	pumpkin_bullets[j].px =  pumpkin_bullets[j].px + pumpkin_bullets[j].v;
+           // pumpkin_bullets[j].py =  pumpkin_bullets[j].py + (0.5*gravity*Math.pow(pumpkin_bullets[j].tlapse,2));
+           // pumpkin_bullets[j].tlapse = pumpkin_bullets[j].tlapse + 0.004;
        
             if (pumpkin_bullets[j].px > can.width)
         	   {
@@ -493,8 +523,10 @@ function drawBack() {
                     ctx.drawImage(back, changebg.xBack, 0 ,1200, 500);			//1200--> image width
                     // draw new copy at broomht.right edge of old copy
                     ctx.drawImage(back, changebg.xBack +1200 , 0 ,1200 , 500);
+                    ctx.drawImage(clouds, -100 , 0 , 900, 500);
+                  
 			}
-			
+
 function lightning()
 	{
 				if(Math.random()*1000 < (changebg.xIncr*2) && bingo==1 && y1!=0 && y2!=0)
@@ -510,7 +542,7 @@ function lightning()
 					else if(m%1000>400 && m%1000<405)					//when lightning strikes; check for broom under it
 					{
 						ctx.drawImage(thunderImage3,bingo, 0 ,325, 320);
-					
+
 					if((bingo-broomht.shipX)<30 && (bingo-broomht.shipX)>-250 && bingo!=1)
     				{
     					if(broomht.shipY<250)
@@ -531,12 +563,12 @@ function lightning()
 				if(Math.random()*200<4)
 				ctx.drawImage(lightImage, Math.random()*800, 0 ,50, 200);
 	}
-	
+
 
 function drawbroom() {
 	 // load sprite  
     var t  = time/1000;
-    var speed = 1500;
+    
     var slow = 1.01;    
     	  
     	 // for broomht.direction movement 
@@ -545,7 +577,7 @@ function drawbroom() {
     		   if(broomht.shipX > can.width-70)
     		      broomht.shipX += 0; 
     	      else
-    		      broomht.shipX += speed*t;
+    		      broomht.shipX +=  broomht.normalspeed;
     	   }
         else 
         	if (37 in keysDown || broomht.left) 
@@ -553,7 +585,7 @@ function drawbroom() {
         	   if(broomht.shipX < 20)
         	      broomht.shipX += 0; 
         	   else 
-        	      broomht.shipX -= speed*t;
+        	      broomht.shipX -= broomht.normalspeed;
            }
         else
         	if (38 in keysDown || broomht.up)   
@@ -561,7 +593,7 @@ function drawbroom() {
     		   if(broomht.shipY < 10)
     		      broomht.shipY += 0;
     	       else 
-    		      broomht.shipY -= speed*t;
+    		      broomht.shipY -= broomht.upspeed;
     	   }
         else 
         	if (40 in keysDown || broomht.down)
@@ -569,7 +601,7 @@ function drawbroom() {
         	   if(broomht.shipY > can.height-70)
                  broomht.shipY += 0;
                else 
-        	      broomht.shipY += speed*t;
+        	      broomht.shipY += broomht.downspeed;
            }
        else
     	   {
@@ -645,7 +677,7 @@ function hitbats()
 	for(j = 0; j < pumpkin_bullets.length ; j++ ) 
 	{
 	  index = pumpkin_bullets.indexOf(pumpkin_bullets[j]);
-		
+
 	if(big_bat[bb].exist)
 	{ 
 	   if((changebat.xBack+big_bat[bb].pos_space-pumpkin_bullets[j].px)<40 && (changebat.xBack+big_bat[bb].pos_space-pumpkin_bullets[j].px)>-20 )
@@ -727,9 +759,9 @@ function drawBullet() {
      
 function drawScore() {
 			if(l%100==5)sc.score-=2;
-			
+
 			if(sc.score>100) sc.score=100;
-			
+
 			if(finalscore.score>prob*300)	//increases speed of the game
 			{
 				prob++;	
@@ -748,19 +780,19 @@ function drawScore() {
 
 function checkstatus(){		
 		var i=0;
-		
+
 		if(sc.score>0)chkstat=0;
 		else if(chkstat==0 && sc.score<=0)
 			chkstat=l;
-		if(l-chkstat>1000 && chkstat!=0 && sc.score<=0)
+		if(l-chkstat>1000 && chkstat!=0 && sc.score<=0 && restart==0)
 		{
 			finalscore.endtime= ((((new Date()).getTime()-finalscore.startime)-(((new Date()).getTime()-finalscore.startime)%100))/100);
 				ctx.fillText("GAME OVER ",400,250);
-				
+
 				ctx.fillText("Press C to play again",400,300);
 				restart = 1;
 				//swoop();						//for swooping down after losing
-				//lose();
+				//lose(); 
 		}
 		else
 			finalscore.score = ((((new Date()).getTime()-finalscore.startime)-(((new Date()).getTime()-finalscore.startime)%100))/100);
@@ -794,7 +826,7 @@ function resetTargets()  // make changes
 					changesmallbat2.xBack += 1200;			
 					y2=0;
 				}
-				
+
 			if(changebat.xBack<-1200)
 				{ 
 					changebat.xBack += 1200; 		// create a for loop for bats here 
@@ -803,12 +835,12 @@ function resetTargets()  // make changes
 						if(Math.random() < 0.2)
 							big_bat[bb].exist = 0;
 						 else 
-							big_bat[bb].exist = 1;
+						 big_bat[bb].exist = 1;
 				  	     big_bat[bb].ht = Math.random()*250+bb*50;
 				  	     big_bat[bb].broomcol = 1;
 				  		}	
 				}
-			
+
 			if (changebg.xBack <= -1 * 1200)
             	{
 					changebg.xBack += 1200;
@@ -820,13 +852,13 @@ function resetTargets()  // make changes
 					ghostspawn.gy=350;
 					ghostspawn.collide=0;
 					p=0;
-					
+
 					fruit1.arr=Math.random()*300+50;
 					fruit2.arr=Math.random()*300+50;
 					target1=[1,1,1,1];
 					target2=[1,1,1,1];
 				}				
-			
+
 			if(l%10==3)
 			{
 				document.getElementById("bat").src=document.getElementById("bat1").src;
@@ -848,7 +880,7 @@ function resetTargets()  // make changes
 				document.getElementById("smallbat2").src=document.getElementById("bat1").src;
 				document.getElementById("smallbat3").src=document.getElementById("bat2").src;
 			}
-			
+
 			if(l%50==0)
 			{
 				document.getElementById("smallbat1").src=document.getElementById("bat1").src;
@@ -867,8 +899,9 @@ function resetTargets()  // make changes
 				document.getElementById("smallbat2").src=document.getElementById("bat1").src;
 				document.getElementById("smallbat3").src=document.getElementById("bat2").src;
 			}
-			
-			l++; m++;
+
+			l++;
+			m++;
 	}
 
 function colonyofbats(){
@@ -903,7 +936,7 @@ function colonyofbats(){
 							ctx.drawImage(smallbat2, changesmallbat2.xBack +750+ r ,n+200+10*Math.random() ,15 ,15);
     						if(i%3==2)
 							ctx.drawImage(smallbat3, changesmallbat2.xBack +750+ r ,n+200+10*Math.random() ,15 ,15);							
-							
+
 							if((changesmallbat2.xBack+750+r-broomht.shipX)<50 && (changesmallbat2.xBack+750+r-broomht.shipX)>-10)
     							{	
 										if((broomht.shipY-n-200)<30 && (broomht.shipY-n-200)>-70 && bat_collide2[i]==0)
@@ -920,7 +953,7 @@ function ghosts()
 	    	p=1;
 			ctx.drawImage(ghostimage, changebg.xBack+ghostspawn.gx, ghostspawn.gy ,50 ,50);
 			ghostspawn.gy-=ghostspawn.v;
-			
+
 			if((changebg.xBack+ghostspawn.gx-broomht.shipX)<50 && (changebg.xBack+ghostspawn.gx-broomht.shipX)>-10)
     			{	
 				if((broomht.shipY-ghostspawn.gy)<40 && (broomht.shipY-ghostspawn.gy)>-70 && ghostspawn.collide==0)
